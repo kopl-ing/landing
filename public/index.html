@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopling — community software that engages</title>
+    <meta name="description" content="Kopling is open source, federated, mobile-first community software. Follow the build or sponsor development.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --ink:#0E1A38;
+            --delft:#2B4A9B;
+            --delft-deep:#16295E;
+            --delft-night:#0F1E47;
+            --porcelain:#F2F4F3;
+            --paper:#FBFCFC;
+            --glaze:#D9E2F1;
+            --glaze-dim:#A9BCDE;
+            --signal:#E8590C;
+            --signal-dark:#C74A08;
+            --line:rgba(14,26,56,.14);
+            --line-light:rgba(217,226,241,.18);
+            --display:"Bricolage Grotesque",system-ui,sans-serif;
+            --body:"Instrument Sans",system-ui,sans-serif;
+            --mono:"Spline Sans Mono",ui-monospace,monospace;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:var(--body);color:var(--ink);background:var(--porcelain);line-height:1.6;font-size:17px}
+        img,svg{display:block}
+        a{color:inherit}
+        :focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:2px}
+        .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+        .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+
+        /* ---------- nav ---------- */
+        .nav{position:sticky;top:0;z-index:50;background:rgba(22,41,94,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-light)}
+        .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+        .nav a{text-decoration:none}
+        .nav-links{display:flex;gap:28px;align-items:center}
+        .nav-links a{color:var(--glaze);font-size:.92rem;font-weight:500}
+        .nav-links a:hover{color:#fff}
+        .nav-links .btn{padding:.5em 1.1em}
+
+        /* wordmark: o as clutch rings */
+        .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
+        .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
+        .wordmark.dark-on-light{color:var(--ink)}
+
+        /* ---------- buttons ---------- */
+        .btn{display:inline-block;font-family:var(--body);font-weight:600;font-size:.95rem;text-decoration:none;border-radius:8px;padding:.72em 1.4em;border:1.5px solid transparent;cursor:pointer;transition:transform .12s ease,background .15s ease,color .15s ease}
+        .btn:active{transform:translateY(1px)}
+        .btn-signal{background:var(--signal);color:#fff}
+        .btn-signal:hover{background:var(--signal-dark)}
+        .btn-ghost{border-color:var(--glaze-dim);color:var(--glaze)}
+        .btn-ghost:hover{border-color:var(--porcelain);color:#fff}
+        .btn-ink{background:var(--ink);color:var(--porcelain)}
+        .btn-ink:hover{background:var(--delft-deep)}
+
+        /* ---------- hero ---------- */
+        .hero{background:
+                radial-gradient(1100px 500px at 85% -10%, rgba(43,74,155,.55), transparent 60%),
+                linear-gradient(180deg, var(--delft-deep), var(--delft-night));
+            color:var(--porcelain);position:relative;overflow:hidden}
+        .hero::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23D9E2F1' stroke-width='1'%3E%3Cpath d='M0 12 Q12 12 12 0 M84 0 Q84 12 96 12 M96 84 Q84 84 84 96 M12 96 Q12 84 0 84'/%3E%3C/g%3E%3C/svg%3E");
+            background-size:96px 96px}
+        .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:88px 0 96px;position:relative}
+        .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,5vw,3.7rem);line-height:1.04;letter-spacing:-.02em;margin:18px 0 20px}
+        .hero h1 em{font-style:normal;color:var(--signal)}
+        .hero p.lede{font-size:1.13rem;color:var(--glaze);max-width:34em}
+        .hero .eyebrow{color:var(--glaze-dim)}
+        .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+        .hero-note{margin-top:22px;font-family:var(--mono);font-size:.8rem;color:var(--glaze-dim)}
+
+        /* live thread demo */
+        .thread{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:0 24px 60px rgba(6,12,32,.45);overflow:hidden;max-width:460px;justify-self:end;width:100%}
+        .thread-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
+        .thread-head strong{font-family:var(--display);font-weight:600;font-size:.95rem}
+        .live-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--delft)}
+        .live-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--signal)}
+        .thread-body{padding:8px 18px 14px;min-height:328px;display:flex;flex-direction:column;justify-content:flex-end}
+        .post{display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
+        .post:last-child{border-bottom:none}
+        .avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-weight:600;font-size:.8rem;font-family:var(--display)}
+        .post .meta{font-size:.78rem;color:#5A6272;font-family:var(--mono)}
+        .post .meta b{color:var(--ink);font-family:var(--body);font-weight:600;font-size:.86rem}
+        .post p{font-size:.9rem;line-height:1.45;margin-top:2px}
+        .post.incoming{animation:slidein .45s ease both}
+        .typing{display:flex;gap:5px;align-items:center;padding:10px 0 4px;height:26px}
+        .typing span{width:6px;height:6px;border-radius:50%;background:var(--glaze-dim);animation:blink 1.2s infinite}
+        .typing span:nth-child(2){animation-delay:.2s}
+        .typing span:nth-child(3){animation-delay:.4s}
+        .typing[hidden]{display:none}
+        @keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+        .live-pill .dot{animation:pulse 2s infinite}
+
+        /* ---------- meaning strip ---------- */
+        .meaning{background:var(--delft-night);color:var(--glaze);border-top:1px solid var(--line-light)}
+        .meaning-inner{display:flex;gap:20px;align-items:baseline;padding:20px 0;flex-wrap:wrap}
+        .meaning .word{font-family:var(--display);font-weight:600;font-size:1.05rem;color:var(--porcelain)}
+        .meaning .def{font-size:.95rem}
+        .meaning .def i{color:var(--glaze-dim)}
+
+        /* ---------- sections ---------- */
+        section{padding:88px 0}
+        .section-head{max-width:44em;margin-bottom:48px}
+        .section-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,3.4vw,2.5rem);letter-spacing:-.015em;line-height:1.1;margin:14px 0 14px}
+        .section-head p{color:#3A4358;font-size:1.05rem}
+        .section-head .eyebrow{color:var(--delft)}
+
+        /* principles */
+        .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+        .principle{background:var(--paper);padding:30px 26px}
+        .principle h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin-bottom:8px}
+        .principle p{font-size:.93rem;color:#3A4358}
+        .principle .p-mark{font-family:var(--mono);font-size:.75rem;color:var(--delft);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:14px}
+
+        /* ---------- spec sheet ---------- */
+        .spec{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+        .spec-table{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+        .spec-row{display:grid;grid-template-columns:190px 1fr 1.15fr;border-bottom:1px solid var(--line)}
+        .spec-row:last-child{border-bottom:none}
+        .spec-row:nth-child(even){background:var(--porcelain)}
+        .spec-row > div{padding:20px 24px}
+        .spec-key{font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);padding-top:24px !important}
+        .spec-val{font-weight:600;font-size:1rem}
+        .spec-val small{display:block;font-weight:400;font-family:var(--mono);font-size:.78rem;color:#5A6272;margin-top:4px}
+        .spec-why{font-size:.9rem;color:#3A4358;border-left:1px solid var(--line)}
+        .spec-foot{font-family:var(--mono);font-size:.78rem;color:#5A6272;margin-top:18px}
+
+        /* ---------- extension callout ---------- */
+        .devs .dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+        .devs h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.015em;line-height:1.12;margin:14px 0 16px}
+        .devs p{color:#3A4358}
+        .devs ul{list-style:none;margin-top:20px}
+        .devs li{padding:10px 0;border-bottom:1px dashed var(--line);font-size:.95rem;display:flex;gap:12px}
+        .devs li::before{content:"—";color:var(--signal);font-weight:600}
+        .code{background:var(--delft-night);color:var(--glaze);border-radius:14px;padding:26px 28px;font-family:var(--mono);font-size:.84rem;line-height:1.7;overflow-x:auto;box-shadow:0 18px 44px rgba(6,12,32,.25)}
+        .code .cm{color:#7E93C4}
+        .code .kw{color:#F2A07B}
+        .code .st{color:#BFD3F2}
+
+        /* ---------- governance ---------- */
+        .gov{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+        .commitment{display:grid;grid-template-columns:1fr 1.4fr;gap:32px;padding:26px 0;border-bottom:1px solid var(--line)}
+        .commitment:last-of-type{border-bottom:none}
+        .commitment h3{font-family:var(--display);font-weight:600;font-size:1.25rem;letter-spacing:-.01em;line-height:1.25}
+        .commitment p{font-size:.95rem;color:#3A4358}
+        .gov-foot{margin-top:36px;padding:22px 26px;border:1px dashed var(--glaze-dim);border-radius:12px;display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;justify-content:space-between}
+        .gov-foot p{font-size:.92rem;color:#3A4358;max-width:38em}
+        @media (max-width:700px){.commitment{grid-template-columns:1fr;gap:8px}}
+
+        /* ---------- founder ---------- */
+        .founder-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start}
+        .founder h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.015em;line-height:1.12;margin:14px 0 16px}
+        .founder .lede-p{color:#3A4358;font-size:1.02rem;margin-bottom:16px}
+        .founder blockquote{border-left:3px solid var(--signal);padding:4px 0 4px 20px;margin:26px 0 0;font-family:var(--display);font-weight:500;font-size:1.12rem;line-height:1.5;color:var(--ink)}
+        .founder blockquote footer{font-family:var(--mono);font-size:.78rem;color:#5A6272;margin-top:12px;font-weight:400}
+        .receipts{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+        .receipt{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--line)}
+        .receipt:last-child{border-bottom:none}
+        .receipt:nth-child(even){background:var(--porcelain)}
+        .receipt > span{padding:16px 20px;font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);padding-top:19px}
+        .receipt > p{padding:16px 20px 16px 0;font-size:.92rem;color:#3A4358}
+        .receipt > p b{color:var(--ink)}
+        @media (max-width:940px){.founder-grid{grid-template-columns:1fr}}
+        @media (max-width:600px){.receipt{grid-template-columns:1fr}.receipt > p{padding:0 20px 16px}}
+
+        /* ---------- support ---------- */
+        .support{background:
+                radial-gradient(900px 420px at 10% 0%, rgba(43,74,155,.5), transparent 60%),
+                linear-gradient(180deg, var(--delft-deep), var(--delft-night));
+            color:var(--porcelain)}
+        .support .section-head .eyebrow{color:var(--glaze-dim)}
+        .support .section-head p{color:var(--glaze)}
+        .support-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+        .card{background:rgba(251,252,252,.05);border:1px solid var(--line-light);border-radius:14px;padding:34px 32px}
+        .card h3{font-family:var(--display);font-weight:600;font-size:1.3rem;margin-bottom:10px}
+        .card p{color:var(--glaze);font-size:.95rem;margin-bottom:22px}
+        .field-row{display:flex;gap:10px}
+        .field-row input{flex:1;min-width:0;padding:.72em 1em;border-radius:8px;border:1.5px solid var(--glaze-dim);background:rgba(251,252,252,.06);color:var(--porcelain);font-family:var(--body);font-size:.95rem}
+        .field-row input::placeholder{color:var(--glaze-dim)}
+        .field-row input:focus{outline:3px solid var(--signal);outline-offset:2px;border-color:transparent}
+        .form-note{font-family:var(--mono);font-size:.75rem;color:var(--glaze-dim);margin-top:14px}
+        .form-ok{display:none;font-weight:600;color:#fff;background:rgba(232,89,12,.18);border:1px solid var(--signal);border-radius:8px;padding:.72em 1em;margin-top:4px}
+        .sponsor-row{display:flex;gap:12px;flex-wrap:wrap}
+        .support .fineprint{margin-top:40px;font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim);max-width:52em}
+
+        /* ---------- footer ---------- */
+        footer{color:var(--glaze-dim);border-top:1px solid var(--line-light)}
+        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding:28px 0;gap:20px;flex-wrap:wrap;font-size:.88rem}
+        .foot-inner a{color:var(--glaze)}
+
+        /* ---------- responsive ---------- */
+        @media (max-width:940px){
+            .hero-grid{grid-template-columns:1fr;padding:64px 0 72px}
+            .thread{justify-self:start;max-width:520px}
+            .principles{grid-template-columns:1fr 1fr}
+            .devs .dev-grid{grid-template-columns:1fr}
+            .support-grid{grid-template-columns:1fr}
+            .spec-row{grid-template-columns:150px 1fr}
+            .spec-why{grid-column:1 / -1;border-left:none;border-top:1px dashed var(--line);padding-top:14px !important}
+        }
+        @media (max-width:600px){
+            .principles{grid-template-columns:1fr}
+            .spec-row{grid-template-columns:1fr}
+            .spec-key{padding-bottom:0 !important}
+            .nav-links a:not(.btn){display:none}
+            section{padding:64px 0}
+        }
+        @media (prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            .post.incoming{animation:none}
+            .typing span,.live-pill .dot{animation:none}
+            *{transition:none !important}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" aria-label="Main">
+    <div class="wrap nav-inner">
+        <a href="#top" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
+        <div class="nav-links">
+            <a href="#principles">Principles</a>
+            <a href="#stack">The stack</a>
+            <a href="#extend">Extend</a>
+            <a href="#governance">Governance</a>
+            <a href="#support" class="btn btn-signal">Sponsor</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+    <div class="wrap hero-grid">
+        <div>
+            <span class="eyebrow">Open source · Federated · Mobile-first</span>
+            <h1>Community software that <em>engages</em>.</h1>
+            <p class="lede">Kopling is a new platform for communities that want to be involved <strong>now</strong> — sharing moments the second they happen, building a following from the first post, and keeping every conversation structured instead of scattered.</p>
+            <div class="hero-ctas">
+                <a class="btn btn-signal" href="#support">Follow the build</a>
+                <a class="btn btn-ghost" href="#stack">Read the decisions</a>
+            </div>
+            <p class="hero-note">In development · built by the former project manager of Flarum — <a href="#founder" style="color:var(--glaze)">why that matters</a></p>
+        </div>
+
+        <!-- live thread demo -->
+        <div class="thread" role="img" aria-label="Demonstration of a Kopling discussion updating live: new replies appear as they are posted.">
+            <div class="thread-head">
+                <strong>Pedal Builders · First solder joints</strong>
+                <span class="live-pill"><span class="dot"></span>Live</span>
+            </div>
+            <div class="thread-body" id="thread-body">
+                <div class="post">
+                    <span class="avatar" style="background:#2B4A9B">MV</span>
+                    <div><div class="meta"><b>Mara</b> · 2m</div><p>Finished the fuzz circuit tonight — first pedal that didn't hum. Posting the board photos now.</p></div>
+                </div>
+                <div class="post">
+                    <span class="avatar" style="background:#E8590C">JD</span>
+                    <div><div class="meta"><b>Jonas</b> · 1m</div><p>That was fast. Which transistors did you end up using?</p></div>
+                </div>
+                <div class="typing" id="typing" hidden><span></span><span></span><span></span></div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ============ MEANING ============ -->
+<div class="meaning">
+    <div class="wrap meaning-inner">
+        <span class="word">kop·ling</span>
+        <span class="def">from Dutch <i>koppeling</i> — clutch. <i>The mechanism that connects and engages.</i></span>
+    </div>
+</div>
+
+<!-- ============ PRINCIPLES ============ -->
+<section id="principles">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Principles</span>
+            <h2>Five commitments, made before the first release.</h2>
+            <p>These aren't features on a roadmap. They're constraints every technical decision below was tested against.</p>
+        </div>
+        <div class="principles">
+            <div class="principle">
+                <span class="p-mark">Open source</span>
+                <h3>Yours to run, read, and fork</h3>
+                <p>Free license, public development, and a governance model designed before the community arrives — not after.</p>
+            </div>
+            <div class="principle">
+                <span class="p-mark">Federated</span>
+                <h3>Conversations across instances</h3>
+                <p>Discussions federate as discussions — threaded, forum-shaped — over ActivityPub, following the trail Discourse and NodeBB blazed.</p>
+            </div>
+            <div class="principle">
+                <span class="p-mark">Mobile-first</span>
+                <h3>Designed for the device in your hand</h3>
+                <p>Server-rendered pages that are fast on weak connections, installable as an app, with push notifications from day one.</p>
+            </div>
+            <div class="principle">
+                <span class="p-mark">Immediate</span>
+                <h3>Live by default</h3>
+                <p>Replies stream in as they're posted. Share the moment while it's still a moment — no refresh button required.</p>
+            </div>
+            <div class="principle">
+                <span class="p-mark">Extensible</span>
+                <h3>An ecosystem, not an afterthought</h3>
+                <p>Extensions are PHP and templates — no build step, no frontend framework to learn, no upgrade roulette.</p>
+            </div>
+            <div class="principle">
+                <span class="p-mark">For every scale</span>
+                <h3>Friend groups to enterprises</h3>
+                <p>Runs modestly on modest hosting, shines on real infrastructure — and tells you plainly which mode you're in.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ SPEC SHEET ============ -->
+<section id="stack" class="spec">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Specification</span>
+            <h2>The stack, decided.</h2>
+            <p>Most projects announce a vision. We're publishing the engineering decisions — and the reasoning — so you know exactly what you'd be building on, contributing to, or sponsoring.</p>
+        </div>
+
+        <div class="spec-table">
+            <div class="spec-row">
+                <div class="spec-key">Backend</div>
+                <div class="spec-val">PHP · Laravel<small>full framework, wrapped in Kopling contracts</small></div>
+                <div class="spec-why">The most widely known PHP stack there is. Extensions code against stable Kopling APIs, so framework upgrades never ripple through the ecosystem.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Frontend</div>
+                <div class="spec-val">htmx 4 + Blade + Alpine<small>HTML over the wire</small></div>
+                <div class="spec-why">The server is the single source of truth. Interactivity lives in attributes, live updates stream over SSE and WebSockets, and there is no client framework for extension authors to learn.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Styling</div>
+                <div class="spec-val">Tailwind v4 + daisyUI<small>beneath a Kopling component library</small></div>
+                <div class="spec-why">A documented set of ready-made components — buttons, forms, modals — with accessibility and behavior built in. Admins re-theme at runtime; no rebuild, ever.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Editor</div>
+                <div class="spec-val">Tiptap<small>structured content, rendered server-side</small></div>
+                <div class="spec-why">Posts are stored as structured documents and rendered to HTML in PHP. Extensions add rich content types — polls, embeds — validated and sanitized on the server.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Federation</div>
+                <div class="spec-val">ActivityPub<small>forum-shaped conversations</small></div>
+                <div class="spec-why">Threaded discussions federate as threaded discussions, compatible with the emerging forum federation work — not flattened into microblog posts.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Identity</div>
+                <div class="spec-val">UUIDv7 everywhere<small>origin-aware from the first migration</small></div>
+                <div class="spec-why">Time-ordered universal IDs keep massive databases fast and make every object addressable across instances. Remote content is a first-class citizen in the schema.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Extensions</div>
+                <div class="spec-val">Kopling registry<small>Composer-compatible · kopl.ing</small></div>
+                <div class="spec-why">One official registry with machine-checked compatibility — core versions, database support, conflicts — surfaced before you install. Anyone can run their own.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Storage</div>
+                <div class="spec-val">Capability-based filesystems<small>named drivers, mapped by admins</small></div>
+                <div class="spec-why">Extensions declare what they need — public URLs, cloud, signed links. Admins define storage once and map requests to it from the admin panel.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Databases</div>
+                <div class="spec-val">MySQL · MariaDB · Postgres · SQLite<small>declared per extension</small></div>
+                <div class="spec-why">SQLite makes small communities and local development trivial; Postgres and MySQL carry the big ones. Extensions declare engine support in their manifest.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Realtime</div>
+                <div class="spec-val">SSE + WebSockets<small>with honest degradation</small></div>
+                <div class="spec-why">Full live updates on real infrastructure; graceful fallbacks on shared hosting — with a health dashboard that names exactly what's degraded and why.</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-key">Translations</div>
+                <div class="spec-val">Core-team owned<small>one platform for software and docs</small></div>
+                <div class="spec-why">Localization is official infrastructure, not a volunteer's side project. Strings flow from the registry to translators and back as installable language packs.</div>
+            </div>
+        </div>
+        <p class="spec-foot">rev. 2026-07 — decisions are published before code so they can be challenged early. Disagree? That's what the discussion is for.</p>
+    </div>
+</section>
+
+<!-- ============ EXTENSION DEV ============ -->
+<section id="extend" class="devs">
+    <div class="wrap dev-grid">
+        <div>
+            <span class="eyebrow" style="color:var(--delft)">For extension developers</span>
+            <h2>An extension is PHP and templates. Full stop.</h2>
+            <p>If you've ever built for a forum platform, you know the pain: a bespoke frontend framework, a mandatory build pipeline, and monkey-patching that shatters on every core update. Kopling's extension surface is designed so that none of that exists.</p>
+            <ul>
+                <li>Inject into named outlets across the UI — declared, prioritized, discoverable</li>
+                <li>Ship interactivity as attributes in your own templates — no compile step</li>
+                <li>Update core-owned regions through the response, never by patching core code</li>
+                <li>Optional JavaScript for the rare cases that truly need it — plain modules, no bundler required</li>
+            </ul>
+        </div>
+        <pre class="code" aria-label="Example extension code"><span class="cm">// A complete "reactions" feature: one hook, one template.</span>
+
+<span class="kw">Outlet</span>::add(<span class="st">'post.actions'</span>, <span class="st">'reactions::button'</span>);
+
+<span class="cm">&lt;!-- reactions/button.blade.php --&gt;</span>
+<span class="kw">&lt;x-k::action</span> :post=<span class="st">"route('reactions.toggle', $ctx)"</span>
+             swap=<span class="st">"outer"</span><span class="kw">&gt;</span>
+    👍 {{ $ctx-&gt;reactions_count }}
+<span class="kw">&lt;/x-k::action&gt;</span></pre>
+    </div>
+</section>
+
+<!-- ============ GOVERNANCE ============ -->
+<section id="governance" class="gov">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Governance</span>
+            <h2>Rules written before the crowd arrives.</h2>
+            <p>Most open source projects improvise their governance after the community shows up — and pay for it later. Kopling states its model up front, before anyone contributes a line: founder-led, with published guarantees that hold no matter who leads. Six commitments are already settled:</p>
+        </div>
+
+        <div class="commitment">
+            <h3>Founder-led, and it says so.</h3>
+            <p>One person holds final say and is named. No pretend democracy, no diffuse ownership where accountability goes to die. Decisions follow a decide-by-default process: proposed in public, an objection window stated, the outcome and reasoning recorded in writing.</p>
+        </div>
+        <div class="commitment">
+            <h3>The license is your protection.</h3>
+            <p>The code is free software and stays that way. The right to fork is the community's ultimate constitutional guarantee — it keeps any leadership honest, this one included. No source-available bait, no relicensing rug-pull.</p>
+        </div>
+        <div class="commitment">
+            <h3>Money never buys influence.</h3>
+            <p>Sponsors and donors receive recognition, visibility, and a consulted voice — never authority over technical decisions, moderation, or the roadmap. Funding and governance are deliberately decoupled, and finances are published.</p>
+        </div>
+        <div class="commitment">
+            <h3>Public by default.</h3>
+            <p>Decisions, their reasoning, and the project's money live in the open. Private handling is a narrow, named, time-bounded exception — for people's privacy, legal matters, and unreleased security fixes — never a habit.</p>
+        </div>
+        <div class="commitment">
+            <h3>A steering committee with real authority.</h3>
+            <p>A technical steering committee, chartered with responsibilities of its own — binding say over the extension API contract, breaking-change policy, and deprecation windows. It starts small, earns scope as the contributor pool grows, and its remit is written down, not implied.</p>
+        </div>
+        <div class="commitment">
+            <h3>Built to outlive its founder.</h3>
+            <p>Founder-led must never mean founder-dependent. A written succession plan — what happens to the code, the trademark, the registry, and the infrastructure — is published before 1.0, so the project's future never rests on one person's availability.</p>
+        </div>
+
+        <div class="gov-foot">
+            <p>The full governance charter — the steering committee's chartered responsibilities included — is being drafted in the open, in plain language, and will be adopted before the 1.0 release. Kopling will govern itself on its own software: every decision, discussed and recorded on a Kopling instance.</p>
+            <a class="btn btn-ink" href="#support">Hold us to it</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FOUNDER ============ -->
+<section id="founder" class="founder">
+    <div class="wrap founder-grid">
+        <div>
+            <span class="eyebrow" style="color:var(--delft)">Who's building this</span>
+            <h2>Decisions are cheap. Twenty years of learning why isn't.</h2>
+            <p class="lede-p">Anyone can publish a spec sheet. What can't be copied is the career that produced this one — two decades running on both tracks at once: engineering leadership in enterprise software by day, open source community stewardship the rest of the time. Kopling is where those tracks finally merge.</p>
+            <p class="lede-p">Every commitment on this page is a lesson paid for in practice: the extension APIs that broke ecosystems, the governance that arrived too late, the hosting realities that make or break adoption, the maintainers who burned out unpaid. Kopling isn't a fresh idea — it's a second attempt, informed by all of it.</p>
+            <blockquote>
+                “I've watched brilliant community software struggle for every reason except the code. Kopling is what I'd build knowing what I know now — and this time, the hard lessons are decided before the first release, not after.”
+                <footer>— Daniël Klabbers, founder · <a href="https://github.com/luceos" style="color:var(--delft)">GitHub</a> · <a href="https://www.linkedin.com/in/luceos/" style="color:var(--delft)">LinkedIn</a></footer>
+            </blockquote>
+        </div>
+        <div class="receipts" aria-label="Track record">
+            <div class="receipt"><span>Leadership</span><p><b>A decade leading Flarum</b> — from moderator to core developer to chairman of its foundation. Releases, roadmap, team, and an ecosystem of hundreds of extensions.</p></div>
+            <div class="receipt"><span>Enterprise</span><p>Led development teams at <b>one of Europe's largest fashion e-commerce platforms</b> — a unicorn — with engineering-lead roles throughout a twenty-year career.</p></div>
+            <div class="receipt"><span>Laravel</span><p>Authored <b>one of the earliest widely adopted Laravel multi-tenancy packages</b> — ecosystem authorship in the exact framework Kopling builds on.</p></div>
+            <div class="receipt"><span>Infrastructure</span><p>Years inside a <b>hosting provider</b>, enterprise cloud migrations, auto-scaling realtime systems — the operational reality behind "runs anywhere, shines on real infrastructure".</p></div>
+            <div class="receipt"><span>Communities</span><p>Guided <b>one of the largest Dutch online communities</b> through a live migration between forum platforms — and has chaired communities since 2008.</p></div>
+            <div class="receipt"><span>Federation</span><p>Took part in the <b>Discourse × NodeBB conversations</b> on forum-to-forum federation — the work Kopling's approach builds on directly.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ SUPPORT ============ -->
+<section id="support" class="support">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Get involved</span>
+            <h2>Built in the open. Funded in the open.</h2>
+            <p>Kopling is at the beginning — the decisions are made, the code is starting. Early followers shape the roadmap; early sponsors make full-time development possible.</p>
+        </div>
+        <div class="support-grid">
+            <div class="card">
+<!--                <h3>Follow the build</h3>-->
+<!--                <p>Development updates, design discussions, and the first public preview — a handful of emails, no noise.</p>-->
+<!--                &lt;!&ndash; Wire this form to your mailing list provider: set the action URL and remove the JS intercept below. &ndash;&gt;-->
+<!--                <form id="interest-form" action="#" method="post">-->
+<!--                    <div class="field-row">-->
+<!--                        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>-->
+<!--                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">-->
+<!--                        <button type="submit" class="btn btn-signal">Keep me posted</button>-->
+<!--                    </div>-->
+<!--                    <p class="form-ok" id="form-ok">You're on the list. First update lands when there's something real to show.</p>-->
+<!--                    <p class="form-note">No tracking, no resale, unsubscribe anytime.</p>-->
+<!--                </form>-->
+            </div>
+            <div class="card">
+                <h3>Sponsor development</h3>
+                <p>Sponsorship funds core development, registry infrastructure, and the translation platform. Sponsors are credited on this site and in every release.</p>
+                <div class="sponsor-row">
+<!--                    <a class="btn btn-signal" href="#" rel="noopener">GitHub Sponsors</a>-->
+                    <a class="btn btn-ghost" href="#" rel="noopener">Open Collective</a>
+                </div>
+<!--                <p class="form-note" style="margin-top:18px">Considering a larger or corporate sponsorship? <a href="mailto:hello@kopl.ing" style="color:var(&#45;&#45;glaze)">hello@kopl.ing</a></p>-->
+            </div>
+        </div>
+        <p class="fineprint">Per the governance commitments above: sponsorship buys recognition and gratitude, never authority. Budgets and spending will be published openly, at a regular cadence.</p>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <div class="wrap foot-inner">
+        <span class="wordmark" style="font-size:1.05rem">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</span>
+        <span>Made in the Netherlands, built for everywhere.</span>
+<!--        <span><a href="https://github.com/kopl-ing">GitHub</a> · <a href="#">Fediverse</a> · <a href="mailto:hello@kopl.ing">Contact</a></span>-->
+    </div>
+</footer>
+
+<script>
+    (function(){
+        // ----- live thread demo -----
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var body = document.getElementById('thread-body');
+        var typing = document.getElementById('typing');
+        var queue = [
+            {n:'Mara', i:'MV', c:'#2B4A9B', t:'now', m:'BC108s in the end. Warmer breakup than the 2N repros.'},
+            {n:'Elif', i:'EK', c:'#3D7C5F', t:'now', m:'Following this thread live from the workshop — demo clip when you have one?'},
+            {n:'Jonas', i:'JD', c:'#E8590C', t:'now', m:'Seconding the demo. Also: this is exactly why I missed forums.'},
+            {n:'Mara', i:'MV', c:'#2B4A9B', t:'now', m:'Uploading now. 12 seconds of glorious noise.'}
+        ];
+        var idx = 0, MAX_POSTS = 5;
+
+        function addPost(p){
+            var el = document.createElement('div');
+            el.className = 'post incoming';
+            el.innerHTML = '<span class="avatar" style="background:'+p.c+'">'+p.i+'</span>'+
+                '<div><div class="meta"><b>'+p.n+'</b> · '+p.t+'</div><p>'+p.m+'</p></div>';
+            body.insertBefore(el, typing);
+            // keep the card height stable
+            var posts = body.querySelectorAll('.post');
+            if(posts.length > MAX_POSTS){ posts[0].remove(); }
+        }
+
+        function tick(){
+            if(idx >= queue.length){ return; }
+            typing.hidden = false;
+            setTimeout(function(){
+                typing.hidden = true;
+                addPost(queue[idx++]);
+                setTimeout(tick, 3200 + Math.random()*1500);
+            }, 1400);
+        }
+
+        if(reduced){
+            // no animation: render two more posts statically
+            addPost(queue[0]); addPost(queue[1]);
+        } else {
+            setTimeout(tick, 2200);
+        }
+
+        // ----- interest form (placeholder handler) -----
+        // Replace with a real POST to your list provider (Buttondown, Listmonk, Mailcoach, …)
+        var form = document.getElementById('interest-form');
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            document.getElementById('form-ok').style.display = 'block';
+            form.querySelector('.field-row').style.display = 'none';
+            form.querySelector('.form-note').textContent = 'Demo form — connect it to your mailing list provider before launch.';
+        });
+    })();
+</script>
+</body>
+</html>
