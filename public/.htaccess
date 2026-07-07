@@ -1,3 +1,0 @@
-RewriteEngine On
-RewriteCond %{HTTP_HOST} ^(www\.)?kopling\.org [NC]
-RewriteRule ^(.*)$ https://kopl.ing [R=301,L]
