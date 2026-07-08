@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kopling — community software that engages</title>
-    <meta name="description" content="Kopling is open source, federated, mobile-first community software. Follow the build or sponsor development.">
+    <title>Kopling — software that turns interaction into relationship</title>
+    <meta name="description" content="Kopling is open source, federated, mobile-first community software built so human interaction can grow into honest, real relationships. Follow the build or sponsor development.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -105,6 +105,12 @@
         .meaning .word{font-family:var(--display);font-weight:600;font-size:1.05rem;color:var(--porcelain)}
         .meaning .def{font-size:.95rem}
         .meaning .def i{color:var(--glaze-dim)}
+
+        /* ---------- mission strip ---------- */
+        .mission{background:var(--porcelain);padding:64px 0}
+        .mission p.big{font-family:var(--display);font-weight:600;font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.35;letter-spacing:-.01em;max-width:30em}
+        .mission p.big em{font-style:normal;color:var(--signal)}
+        .mission p.small{margin-top:16px;color:#3A4358;font-size:1rem;max-width:44em}
 
         /* ---------- sections ---------- */
         section{padding:88px 0}
@@ -242,8 +248,8 @@
     <div class="wrap hero-grid">
         <div>
             <span class="eyebrow">Open source · Federated · Mobile-first</span>
-            <h1>Community software that <em>engages</em>.</h1>
-            <p class="lede">Kopling is a new platform for communities that want to be involved <strong>now</strong> — sharing moments the second they happen, building a following from the first post, and keeping every conversation structured instead of scattered.</p>
+            <h1>Software that turns interaction into <em>relationship</em>.</h1>
+            <p class="lede">People are the engine. Kopling is the clutch: community software that engages the energy people already bring — sharing the moment while it's still a moment, welcoming the very first post, keeping every conversation whole — so interaction can grow into honest, real connection.</p>
             <div class="hero-ctas">
                 <a class="btn btn-signal" href="#support">Follow the build</a>
                 <a class="btn btn-ghost" href="#stack">Read the decisions</a>
@@ -276,7 +282,15 @@
 <div class="meaning">
     <div class="wrap meaning-inner">
         <span class="word">kop·ling</span>
-        <span class="def">from Dutch <i>koppeling</i> — clutch. <i>The mechanism that connects and engages.</i></span>
+        <span class="def">from Dutch <i>koppeling</i> — clutch. <i>A clutch doesn't create motion — it engages power that's already there.</i></span>
+    </div>
+</div>
+
+<!-- ============ MISSION ============ -->
+<div class="mission">
+    <div class="wrap">
+        <p class="big">Kopling exists so human interaction can grow into <em>honest, real relationships</em> — through work, hobbies, friendship, or a stranger's well-intended answer at the right moment.</p>
+        <p class="small">That's why we build for people, not "users". People have real emotions, struggles, and hopes — good days and bad ones. Engagement is what happens when people enjoy each other; it's a consequence we welcome, never a metric we optimize.</p>
     </div>
 </div>
 
@@ -285,8 +299,8 @@
     <div class="wrap">
         <div class="section-head">
             <span class="eyebrow">Principles</span>
-            <h2>Five commitments, made before the first release.</h2>
-            <p>These aren't features on a roadmap. They're constraints every technical decision below was tested against.</p>
+            <h2>Commitments made before the first release.</h2>
+            <p>Connection is the goal; everything below is in service of it. These aren't features on a roadmap — they're constraints every technical decision on this page was tested against.</p>
         </div>
         <div class="principles">
             <div class="principle">
@@ -306,8 +320,8 @@
             </div>
             <div class="principle">
                 <span class="p-mark">Immediate</span>
-                <h3>Live by default</h3>
-                <p>Replies stream in as they're posted. Share the moment while it's still a moment — no refresh button required.</p>
+                <h3>Share it while it's real</h3>
+                <p>A moment shared while it's still a moment is unpolished and honest. Replies stream in live, and a simple "this is cool" counts — warmth shouldn't require an essay.</p>
             </div>
             <div class="principle">
                 <span class="p-mark">Extensible</span>
@@ -454,7 +468,7 @@
         </div>
 
         <div class="gov-foot">
-            <p>The full governance charter — the steering committee's chartered responsibilities included — is being drafted in the open, in plain language, and will be adopted before the 1.0 release. Kopling will govern itself on its own software: every decision, discussed and recorded on a Kopling instance.</p>
+            <p>The full governance charter — the steering committee's chartered responsibilities included — is being drafted in the open, in plain language, and will be adopted before the 1.0 release. It speaks of people, not users: people with real emotions, struggles, and hopes — including the occasional bad day. Kopling will govern itself on its own software: every decision, discussed and recorded on a Kopling instance.</p>
             <a class="btn btn-ink" href="#support">Hold us to it</a>
         </div>
     </div>
@@ -494,27 +508,27 @@
         </div>
         <div class="support-grid">
             <div class="card">
-<!--                <h3>Follow the build</h3>-->
-<!--                <p>Development updates, design discussions, and the first public preview — a handful of emails, no noise.</p>-->
-<!--                &lt;!&ndash; Wire this form to your mailing list provider: set the action URL and remove the JS intercept below. &ndash;&gt;-->
-<!--                <form id="interest-form" action="#" method="post">-->
-<!--                    <div class="field-row">-->
-<!--                        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>-->
-<!--                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">-->
-<!--                        <button type="submit" class="btn btn-signal">Keep me posted</button>-->
-<!--                    </div>-->
-<!--                    <p class="form-ok" id="form-ok">You're on the list. First update lands when there's something real to show.</p>-->
-<!--                    <p class="form-note">No tracking, no resale, unsubscribe anytime.</p>-->
-<!--                </form>-->
+                <!--                <h3>Follow the build</h3>-->
+                <!--                <p>Development updates, design discussions, and the first public preview — a handful of emails, no noise.</p>-->
+                <!--                &lt;!&ndash; Wire this form to your mailing list provider: set the action URL and remove the JS intercept below. &ndash;&gt;-->
+                <!--                <form id="interest-form" action="#" method="post">-->
+                <!--                    <div class="field-row">-->
+                <!--                        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>-->
+                <!--                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">-->
+                <!--                        <button type="submit" class="btn btn-signal">Keep me posted</button>-->
+                <!--                    </div>-->
+                <!--                    <p class="form-ok" id="form-ok">You're on the list. First update lands when there's something real to show.</p>-->
+                <!--                    <p class="form-note">No tracking, no resale, unsubscribe anytime.</p>-->
+                <!--                </form>-->
             </div>
             <div class="card">
                 <h3>Sponsor development</h3>
                 <p>Sponsorship funds core development, registry infrastructure, and the translation platform. Sponsors are credited on this site and in every release.</p>
                 <div class="sponsor-row">
-<!--                    <a class="btn btn-signal" href="#" rel="noopener">GitHub Sponsors</a>-->
+                    <!--                    <a class="btn btn-signal" href="#" rel="noopener">GitHub Sponsors</a>-->
                     <a class="btn btn-ghost" href="#" rel="noopener">Open Collective</a>
                 </div>
-<!--                <p class="form-note" style="margin-top:18px">Considering a larger or corporate sponsorship? <a href="mailto:hello@kopl.ing" style="color:var(&#45;&#45;glaze)">hello@kopl.ing</a></p>-->
+                <!--                <p class="form-note" style="margin-top:18px">Considering a larger or corporate sponsorship? <a href="mailto:hello@kopl.ing" style="color:var(&#45;&#45;glaze)">hello@kopl.ing</a></p>-->
             </div>
         </div>
         <p class="fineprint">Per the governance commitments above: sponsorship buys recognition and gratitude, never authority. Budgets and spending will be published openly, at a regular cadence.</p>
@@ -526,7 +540,7 @@
     <div class="wrap foot-inner">
         <span class="wordmark" style="font-size:1.05rem">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</span>
         <span>Made in the Netherlands, built for everywhere.</span>
-<!--        <span><a href="https://github.com/kopl-ing">GitHub</a> · <a href="#">Fediverse</a> · <a href="mailto:hello@kopl.ing">Contact</a></span>-->
+        <!--        <span><a href="https://github.com/kopl-ing">GitHub</a> · <a href="#">Fediverse</a> · <a href="mailto:hello@kopl.ing">Contact</a></span>-->
     </div>
 </footer>
 
@@ -550,7 +564,6 @@
             el.innerHTML = '<span class="avatar" style="background:'+p.c+'">'+p.i+'</span>'+
                 '<div><div class="meta"><b>'+p.n+'</b> · '+p.t+'</div><p>'+p.m+'</p></div>';
             body.insertBefore(el, typing);
-            // keep the card height stable
             var posts = body.querySelectorAll('.post');
             if(posts.length > MAX_POSTS){ posts[0].remove(); }
         }
@@ -566,21 +579,21 @@
         }
 
         if(reduced){
-            // no animation: render two more posts statically
             addPost(queue[0]); addPost(queue[1]);
         } else {
             setTimeout(tick, 2200);
         }
 
-        // ----- interest form (placeholder handler) -----
-        // Replace with a real POST to your list provider (Buttondown, Listmonk, Mailcoach, …)
+        // ----- interest form (guarded: form is currently commented out) -----
         var form = document.getElementById('interest-form');
-        form.addEventListener('submit', function(e){
-            e.preventDefault();
-            document.getElementById('form-ok').style.display = 'block';
-            form.querySelector('.field-row').style.display = 'none';
-            form.querySelector('.form-note').textContent = 'Demo form — connect it to your mailing list provider before launch.';
-        });
+        if(form){
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                document.getElementById('form-ok').style.display = 'block';
+                form.querySelector('.field-row').style.display = 'none';
+                form.querySelector('.form-note').textContent = 'Demo form — connect it to your mailing list provider before launch.';
+            });
+        }
     })();
 </script>
 </body>
