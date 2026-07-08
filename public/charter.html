@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Kopling Charter</title>
+    <meta name="description" content="The Kopling Charter — mission, doctrine, governance, and technical decisions. A living document, revised in the open.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --ink:#0E1A38;
+            --delft:#2B4A9B;
+            --delft-deep:#16295E;
+            --delft-night:#0F1E47;
+            --porcelain:#F2F4F3;
+            --paper:#FBFCFC;
+            --glaze:#D9E2F1;
+            --glaze-dim:#A9BCDE;
+            --signal:#E8590C;
+            --signal-dark:#C74A08;
+            --line:rgba(14,26,56,.14);
+            --line-light:rgba(217,226,241,.18);
+            --display:"Bricolage Grotesque",system-ui,sans-serif;
+            --body:"Instrument Sans",system-ui,sans-serif;
+            --mono:"Spline Sans Mono",ui-monospace,monospace;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:var(--body);color:var(--ink);background:var(--porcelain);line-height:1.6;font-size:17px}
+        img,svg{display:block}
+        a{color:var(--delft)}
+        :focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:2px}
+        .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+        .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+
+        .nav{position:sticky;top:0;z-index:50;background:rgba(22,41,94,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-light)}
+        .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+        .nav a{text-decoration:none}
+        .nav-links{display:flex;gap:24px;align-items:center}
+        .nav-links a{color:var(--glaze);font-size:.9rem;font-weight:500}
+        .nav-links a:hover{color:#fff}
+        .nav-links .btn{padding:.5em 1.1em}
+        .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
+        .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
+
+        .btn{display:inline-block;font-family:var(--body);font-weight:600;font-size:.9rem;text-decoration:none;border-radius:8px;padding:.6em 1.2em;border:1.5px solid transparent;cursor:pointer;transition:transform .12s ease,background .15s ease,color .15s ease}
+        .btn:active{transform:translateY(1px)}
+        .btn-signal{background:var(--signal);color:#fff}
+        .btn-signal:hover{background:var(--signal-dark)}
+        .btn-ghost{border-color:var(--glaze-dim);color:var(--glaze)}
+        .btn-ghost:hover{border-color:var(--porcelain);color:#fff}
+
+        .dhero{background:
+                radial-gradient(1100px 460px at 85% -10%, rgba(43,74,155,.55), transparent 60%),
+                linear-gradient(180deg, var(--delft-deep), var(--delft-night));
+            color:var(--porcelain);position:relative;overflow:hidden;padding:72px 0 56px}
+        .dhero::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23D9E2F1' stroke-width='1'%3E%3Cpath d='M0 12 Q12 12 12 0 M84 0 Q84 12 96 12 M96 84 Q84 84 84 96 M12 96 Q12 84 0 84'/%3E%3C/g%3E%3C/svg%3E");
+            background-size:96px 96px}
+        .dhero-inner{position:relative}
+        .dhero h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.2vw,3rem);line-height:1.06;letter-spacing:-.02em;margin:16px 0 16px}
+        .dhero p.lede{font-size:1.08rem;color:var(--glaze);max-width:42em}
+        .doc-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim)}
+        .doc-meta strong{color:var(--porcelain);font-weight:600}
+        .live-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--glaze-dim);border:1px solid var(--line-light);border-radius:99px;padding:.35em .9em;margin-top:22px}
+        .live-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+        .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding:56px 0 100px}
+        .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px}
+        .toc-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--delft);margin:16px 0 10px;display:block}
+        .toc-label:first-child{margin-top:0}
+        .toc a{display:block;font-size:.86rem;color:#3A4358;text-decoration:none;padding:5px 0;border-left:2px solid transparent;margin-left:-20px;padding-left:18px}
+        .toc a:hover, .toc a.active{color:var(--delft);border-left-color:var(--signal)}
+
+        .part-banner{background:var(--delft-night);color:var(--porcelain);border-radius:10px;padding:16px 22px;margin:0 0 32px;display:flex;align-items:baseline;gap:12px}
+        .part-banner .tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--glaze-dim);flex-shrink:0}
+        .part-banner .ttl{font-family:var(--display);font-weight:600;font-size:1.05rem}
+
+        .doc-body h2{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,2.6vw,1.9rem);letter-spacing:-.015em;margin:0 0 6px;scroll-margin-top:90px}
+        .doc-body .sec-num{font-family:var(--mono);font-size:.78rem;color:var(--delft);letter-spacing:.08em;text-transform:uppercase}
+        .doc-body section{margin-bottom:64px;padding-bottom:8px}
+        .doc-body h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:28px 0 10px;letter-spacing:-.005em}
+        .doc-body p{color:#28304a;margin-bottom:14px;max-width:68ch}
+        .doc-body p.dim{color:#5A6272;font-size:.92rem}
+        .doc-body ul, .doc-body ol{margin:0 0 16px 1.3em;color:#28304a;max-width:68ch}
+        .doc-body li{margin-bottom:8px}
+        .doc-body code{font-family:var(--mono);font-size:.85em;background:var(--glaze);color:var(--delft-deep);padding:.15em .4em;border-radius:4px}
+        .doc-body strong{font-weight:600;color:var(--ink)}
+        .doc-body a{text-decoration:underline;text-decoration-color:var(--glaze-dim);text-underline-offset:2px}
+        .divider{border:none;border-top:1px solid var(--line);margin:0 0 40px}
+
+        .mission-block{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--signal);border-radius:10px;padding:26px 28px;margin:18px 0 24px}
+        .mission-block p.big{font-family:var(--display);font-weight:600;font-size:1.2rem;line-height:1.45;color:var(--ink)}
+        .mission-block p.big em{font-style:normal;color:var(--signal)}
+        .register-grid{display:grid;grid-template-columns:110px 1fr;gap:6px 16px;margin-top:16px}
+        .register-grid .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);padding-top:2px}
+        .register-grid .v{font-size:.92rem;color:#3A4358}
+
+        .doctrine-item{display:grid;grid-template-columns:36px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+        .doctrine-item:last-child{border-bottom:none}
+        .doctrine-item .num{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--glaze-dim)}
+        .doctrine-item h4{font-family:var(--display);font-weight:600;font-size:1.02rem;margin-bottom:4px}
+        .doctrine-item p{font-size:.92rem;margin-bottom:0}
+
+        .card-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);margin:14px 0 8px}
+        .card-list .row{padding:18px 22px;border-bottom:1px solid var(--line)}
+        .card-list .row:last-child{border-bottom:none}
+        .card-list .row:nth-child(even){background:var(--porcelain)}
+        .card-list .row .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);display:block;margin-bottom:6px}
+        .card-list .row p{margin-bottom:0;font-size:.92rem}
+
+        .commit-list{counter-reset:commit;margin:14px 0}
+        .commit{position:relative;padding:16px 0 16px 40px;border-bottom:1px solid var(--line)}
+        .commit:last-child{border-bottom:none}
+        .commit::before{counter-increment:commit;content:counter(commit);position:absolute;left:0;top:16px;width:26px;height:26px;border-radius:50%;background:var(--delft);color:#fff;font-family:var(--mono);font-size:.78rem;display:flex;align-items:center;justify-content:center}
+        .commit.paired::before{background:var(--signal)}
+        .commit h4{font-family:var(--display);font-weight:600;font-size:1.02rem;margin-bottom:4px}
+        .commit p{font-size:.92rem;margin-bottom:0}
+
+        .dtable{width:100%;border-collapse:collapse;font-size:.86rem;margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+        .dtable th{background:var(--delft-night);color:var(--glaze);text-align:left;padding:10px 14px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+        .dtable td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top;color:#28304a}
+        .dtable tr:nth-child(even) td{background:var(--porcelain)}
+        .dtable td:first-child{font-family:var(--mono);color:var(--delft);white-space:nowrap}
+        .table-scroll{overflow-x:auto}
+
+        .oq-group{margin-bottom:22px}
+        .oq-group h4{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);margin-bottom:10px}
+        .oq-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:.92rem;color:#28304a;max-width:68ch}
+        .oq-item .box{flex-shrink:0;width:16px;height:16px;border:1.5px solid var(--glaze-dim);border-radius:4px;margin-top:3px}
+        .oq-item.open{font-weight:600;color:var(--ink)}
+        .oq-item.open .box{border-color:var(--signal)}
+
+        .amend-box{background:var(--delft-night);color:var(--glaze);border-radius:12px;padding:26px 28px;margin-top:8px}
+        .amend-box h4{font-family:var(--display);color:var(--porcelain);font-weight:600;margin-bottom:8px}
+        .amend-box p{color:var(--glaze);font-size:.92rem;margin-bottom:0}
+
+        footer{background:var(--delft-night);color:var(--glaze-dim);border-top:1px solid var(--line-light)}
+        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding:28px 0;gap:20px;flex-wrap:wrap;font-size:.86rem}
+        .foot-inner a{color:var(--glaze)}
+
+        @media (max-width:900px){
+            .doc-layout{grid-template-columns:1fr;gap:0}
+            .toc{position:static;border-left:none;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:36px}
+            .toc a{margin-left:0}
+            .nav-links a:not(.btn){display:none}
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+    <div class="wrap nav-inner">
+        <a href="index.html" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
+        <div class="nav-links">
+            <a href="index.html#stack">The stack</a>
+            <a href="index.html#governance">Governance</a>
+            <a href="charter.html" style="color:#fff">Charter</a>
+            <a href="index.html#support" class="btn btn-signal">Sponsor</a>
+        </div>
+    </div>
+</nav>
+
+<header class="dhero">
+    <div class="wrap dhero-inner">
+        <span class="eyebrow" style="color:var(--glaze-dim)">Living document</span>
+        <h1>The Kopling Charter</h1>
+        <p class="lede">The source of truth for Kopling — mission, doctrine, governance, and technical decisions, revised in the open. Written for two readers at once: the people building and using Kopling, and any AI assistant working on it.</p>
+        <div class="live-badge"><span class="dot"></span>Revised 2026-07 · amended openly, not silently</div>
+        <div class="doc-meta">
+            <span>Steward: <strong>Daniël Klabbers (luceos)</strong></span>
+            <span>Status: <strong>Working draft</strong></span>
+            <span>This page is the sole canonical charter</span>
+        </div>
+    </div>
+</header>
+
+<div class="wrap doc-layout">
+    <nav class="toc" aria-label="Table of contents">
+        <span class="toc-label">Part A — Governance</span>
+        <a href="#mission">1. Mission</a>
+        <a href="#doctrine">2. Doctrine</a>
+        <a href="#governance">3. Governance model</a>
+        <a href="#legal">4. Legal structure &amp; ownership</a>
+        <a href="#sustainability">5. Sustainable contribution</a>
+        <a href="#transparency">6. Transparency &amp; decisions</a>
+
+        <span class="toc-label">Part B — Building Kopling</span>
+        <a href="#technical">7. Technical decisions</a>
+        <a href="#brand">8. Brand &amp; positioning</a>
+
+        <span class="toc-label">Reference</span>
+        <a href="#working-with-claude">9. Working with Claude</a>
+        <a href="#open-questions">10. Open questions</a>
+        <a href="#decision-log">11. Decision log</a>
+    </nav>
+
+    <div class="doc-body">
+
+        <div class="part-banner"><span class="tag">Part A</span><span class="ttl">Governance — who Kopling is, and how it's run</span></div>
+
+        <section id="mission">
+            <span class="sec-num">Section 1</span>
+            <h2>Mission</h2>
+            <div class="mission-block">
+                <p class="big"><strong>Kopling exists so human interaction can grow into <em>honest, real relationships</em></strong> — through work, hobbies, friendship, or a stranger's well-intended answer at the right moment.</p>
+                <div class="register-grid">
+                    <span class="k">Hero</span><span class="v">Software that turns interaction into relationship.</span>
+                    <span class="k">Metaphor</span><span class="v">People are the engine. Kopling is the clutch — it engages the energy people already bring.</span>
+                    <span class="k">Charter</span><span class="v">The plain sentence above. All three are canonical, at different zoom levels.</span>
+                </div>
+            </div>
+            <h3>The hierarchy of means and ends</h3>
+            <p>Connection is the end. Everything else — including the entire technical stack — serves it:</p>
+            <ul>
+                <li><strong>Immediacy</strong> serves it: a moment shared while it's still a moment is unpolished and honest.</li>
+                <li><strong>Structure</strong> serves it: conversations kept whole instead of scattered.</li>
+                <li><strong>Federation</strong> serves it: connection shouldn't stop at an instance boundary.</li>
+            </ul>
+        </section>
+        <hr class="divider">
+
+        <section id="doctrine">
+            <span class="sec-num">Section 2</span>
+            <h2>Doctrine</h2>
+            <p class="dim">Settled product philosophy. Every feature decision is tested against these six.</p>
+            <div class="doctrine-item">
+                <span class="num">1</span>
+                <div><h4>People, not users.</h4><p>In this charter, the docs, the UI, and public text we speak of people — with real emotions, struggles, and hopes. A vocabulary rule for all Kopling writing.</p></div>
+            </div>
+            <div class="doctrine-item">
+                <span class="num">2</span>
+                <div><h4>Engagement is a consequence, never a KPI.</h4><p>It's what happens when people enjoy each other. No feed ordering, mechanics, or notifications tuned to maximize time-on-site; no outrage amplification; no re-engagement bait. Metrics measure community health — questions answered, newcomers welcomed — not extraction.</p></div>
+            </div>
+            <div class="doctrine-item">
+                <span class="num">3</span>
+                <div><h4>Expression should be effortless; the bond should be honest.</h4><p>Lightweight acknowledgment ("this is cool") is first-class — warmth shouldn't require an essay — and it exists to make the author feel seen, never to feed a scoreboard. Reaction and acknowledgment design is a first-class v1 concern, not an extension afterthought.</p></div>
+            </div>
+            <div class="doctrine-item">
+                <span class="num">4</span>
+                <div><h4>Connection includes help given well.</h4><p>A single honest, unbiased, well-intended answer from a stranger counts. Support communities are inside the mission, not an edge case — which is why the mission avoids intimacy or duration words.</p></div>
+            </div>
+            <div class="doctrine-item">
+                <span class="num">5</span>
+                <div><h4>Moderation addresses harm, not humanity.</h4><p>Someone venting on a bad day is coping, not offending; what needs moderation is impact on others. Assume good faith as the steady state; design for the exception without letting it set the tone; let people return with dignity. Spam and bots are weather, not exception — anti-abuse is core infrastructure in v1, doubly so because federation imports other instances' spam.</p></div>
+            </div>
+            <div class="doctrine-item">
+                <span class="num">6</span>
+                <div><h4>AI serves people, never replaces them.</h4><p>A community succeeds when people show up for each other; AI is never a participant, never simulates warmth, never generates engagement. It's welcome where it demonstrably helps the humans in the room — summaries, translation, moderator triage, admin drafting — judged per role by one test: does each person benefit, or get frustrated? AI involvement is always visible. Admins control levels per community; registry policy bars extensions that make AI impersonate participants.</p></div>
+            </div>
+        </section>
+        <hr class="divider">
+
+        <section id="governance">
+            <span class="sec-num">Section 3</span>
+            <h2>Governance model</h2>
+            <p>Model: <strong>founder-led, stated plainly, with published guarantees that hold no matter who leads.</strong> Full community ownership is explicitly rejected as a starting model — diffuse ownership in the founder's prior open source project caused entrapment, distrust despite due process, and post-departure decay, rather than preventing any of it. Reference class for founder-led open source done well: Laravel, Linux, Ghost.</p>
+
+            <p class="dim">The two commitments most directly about the founder sit together first: who's in charge today, and what happens so the project doesn't depend on that person forever.</p>
+
+            <div class="commit-list">
+                <div class="commit paired"><h4>Founder-led, and it says so.</h4><p>One person holds final say and is named. No pretend democracy, no diffuse ownership where accountability goes to die. Decisions follow a decide-by-default process: proposed in public, an objection window stated, the outcome and reasoning recorded in writing.</p></div>
+                <div class="commit paired"><h4>Built to outlive its founder.</h4><p>Founder-led must never mean founder-dependent. A written succession plan — what happens to the code, the trademark, the registry, and the infrastructure — is published before 1.0, so the project's future never rests on one person's availability.</p></div>
+                <div class="commit"><h4>The license is the protection.</h4><p>Free software forever; the fork right is the community's constitutional guarantee — it keeps any leadership honest, this one included. No relicensing rug-pull.</p></div>
+                <div class="commit"><h4>Money never buys influence.</h4><p>Sponsorship buys recognition and a consulted voice, never authority over technical decisions, moderation, or roadmap. Finances published.</p></div>
+                <div class="commit"><h4>Public by default.</h4><p>Decisions, reasoning, and money live in the open. Private handling is narrow, named, and time-bounded — privacy, legal matters, security embargoes — never a habit.</p></div>
+                <div class="commit"><h4>A steering committee with real authority.</h4><p>Chartered, with binding say over the extension API contract, breaking-change policy, and deprecation windows. Starts small, earns scope as the contributor pool grows; may begin advisory and become binding once functioning.</p></div>
+            </div>
+
+            <p class="dim"><strong>Forward-looking by default:</strong> Kopling's public writing states what it believes and why, without needing a foil. No named comparisons, no score-settling, no "unlike X" framing — the case for each decision stands on its own.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="legal">
+            <span class="sec-num">Section 4</span>
+            <h2>Legal structure &amp; ownership</h2>
+            <p>Kopling is owned personally by Daniël Klabbers today — the trademark, the registry, and any hosted offering. The code itself is free-licensed regardless of who owns the business built around it (Section 3). Personal ownership is the deliberate starting point, not a placeholder apologized for: it's simpler, faster to act on, and honest about the project's current stage.</p>
+            <p>There is a standing plan to move ownership of the commons-facing assets into a Dutch stichting (foundation) at a later date — once neutrality is worth more to the project than the speed and clarity sole ownership provides today. No foundation exists yet, and no separate legal governance layer (statuten) applies until one is formed. When a foundation is created, this charter will describe how it relates to that legal layer; until then, this document is the whole of Kopling's governance.</p>
+            <h3>Sustainability</h3>
+            <p>The founder being paid is a design goal, not a compromise — a decade of unpaid open source maintenance is the failure being corrected, not a standard to preserve. Candidate revenue: hosting, registry services, support.</p>
+            <h3>Charter method</h3>
+            <p>This charter is a single, board-free, amendable document today: a public Decision Log, a Rejected Options register (built out as real rejections accumulate), and plain language for a global readership. If a foundation is created later, a legal layer sits alongside this charter rather than folded into it — this section will be revised to describe that relationship when it exists. Kopling governs itself on a Kopling instance — every decision discussed and recorded in the software it builds.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="sustainability">
+            <span class="sec-num">Section 5</span>
+            <h2>Sustainable contribution &amp; load distribution</h2>
+            <p>Kopling's continued health depends on the wellbeing of the people who sustain it — today, primarily its founder; over time, its contributors. These principles are stated now, before they're tested by real scale, so the project doesn't invent its labor practices under pressure.</p>
+
+            <h3>Role and availability are separate</h3>
+            <p>Holding a role in the project never implies constant availability. Fluctuating availability is normal and expected, not a failure — for the founder today, and for any future contributor.</p>
+
+            <h3>Activity states</h3>
+            <p>As Kopling grows a contributor base, standing is described honestly by one of three states: <strong>active</strong> (the default), <strong>reduced-activity</strong> — a blameless, no-questions-asked pause that suspends duty obligations but keeps role, authority, and standing intact — and <strong>emeritus</strong>, which permanently honors what someone built without any ongoing obligation, and is always reversible. Public team listings distinguish active from emeritus honestly rather than presenting an inactive roster as a healthy one.</p>
+
+            <h3>Bus-factor honesty</h3>
+            <p>Kopling is, by necessity, bus-factor-1 today: one person holds critical knowledge and authority. That's named openly here rather than hidden. Its mitigation is the explicit job of two mechanisms already committed to elsewhere in this charter: the written succession plan (Section 4) and the eventual Technical Steering Committee (Section 3), whose chartered authority exists in part to end this bus-factor-1 state deliberately, on a timeline, rather than by accident.</p>
+
+            <h3>Baseline work versus feature work</h3>
+            <p>Project-critical baseline work — security response, release mechanics, triage, dependency maintenance — is unbounded and recurring, and is where maintainer burnout concentrates, because it offers no natural completion. Feature work is bounded and discretionary and is never an obligation. Once a Technical Steering Committee or a broader contributor base exists, baseline work rotates through a duty roster rather than resting on one person indefinitely.</p>
+
+            <h3>Declining work and the legitimacy of slowness</h3>
+            <p>Declining a proposal, or moving slowly, is normal and legitimate, and reflects on neither the person declining nor the person proposing. Sustainable slowness is preferred to unsustainable speed.</p>
+
+            <h3>Recognition of invisible labor</h3>
+            <p>Once contribution and standing are formalized beyond the founder, they will account for all forms of sustaining work — triage, support, documentation, translation, moderation, and review — not only authored code. Work that goes unseen burns people out faster than work that's valued.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="transparency">
+            <span class="sec-num">Section 6</span>
+            <h2>Transparency &amp; decision-making</h2>
+            <p>Kopling's governance derives its legitimacy from being seen, not merely from being well-intentioned. This section makes that commitment concrete.</p>
+
+            <h3>Public by default</h3>
+            <p>Decisions, their reasoning, and the project's finances are made and recorded in the open — this is already a governance commitment (Section 3); this section states how. Private handling is the narrow, named exception: matters concerning identifiable individuals, active legal matters, and security disclosures before a fix ships. Each exception is time-bounded, and once it lapses, a public summary follows.</p>
+
+            <h3>Where governance happens</h3>
+            <p>Day-to-day discussion can happen anywhere. What must end up public is the <em>record</em> of a decision — the proposal, the reasoning, and the outcome — and that record lives on a Kopling instance itself. This is a small self-referential commitment: using Kopling to govern Kopling is a demonstration of trust in the tool, not just a policy.</p>
+
+            <h3>Cadence</h3>
+            <p>Financial statements and major decisions are published at a regular cadence. The exact cadence per artifact is not yet fixed — see Open Questions — but the commitment to a <em>regular, named</em> cadence, rather than an occasional one, is settled.</p>
+
+            <h3>As governance bodies grow</h3>
+            <p>If and when a Technical Steering Committee or any additional governance body is formed, conflict-of-interest disclosures by its members go into a public register, on the same "visible or it doesn't count" principle that applies to the founder today.</p>
+        </section>
+        <hr class="divider">
+
+        <div class="part-banner"><span class="tag">Part B</span><span class="ttl">Building Kopling — what it's made of, and how it's positioned</span></div>
+
+        <section id="technical">
+            <span class="sec-num">Section 7</span>
+            <h2>Technical decisions</h2>
+            <p class="dim">Settled architecture. Recurring pattern applied throughout: <strong>mainstream tool inside, sovereign Kopling contract outside</strong> — so a dependency's major version becomes a Kopling minor, never an ecosystem-wide break.</p>
+
+            <div class="card-list">
+                <div class="row"><span class="k">Backend</span><p>Full <code>laravel/framework</code> — never cherry-picked illuminate components. Kopling ships its own skeleton. Two-tier extension API: <code>Kopling\Extend\*</code> contracts + blessed Laravel primitives (Eloquent, collections, validation, events); framework internals stay core-only. Laravel majors adopted on Kopling's schedule.</p></div>
+                <div class="row"><span class="k">Frontend</span><p>htmx 4 + Blade + Alpine. Server is the single source of truth; no build step for extensions. Raw <code>hx-*</code> is not the official API — Kopling Blade components (<code>&lt;x-k::action&gt;</code>) emit it. Core-owned JS islands are custom elements so they survive swaps and morphs.</p></div>
+                <div class="row"><span class="k">Extension surface</span><p>"An extension is PHP and templates. Full stop." Named, prioritized outlets across small granular partials; extensions ship routes returning HTML fragments; out-of-band swaps update core regions through the response, never by patching. Outlets compose; overrides don't — overrides require manifest-declared conflict detection.</p></div>
+                <div class="row"><span class="k">Editor</span><p>Tiptap; ProseMirror JSON is canonical; server-rendered via tiptap-php through a whitelist — the same whitelist doubles as the XSS and federation-sanitization model. Extension nodes ship as a PHP renderer + optional plain ESM file, no bundler required. v1 ships core nodes only; the extension node API waits until proven by 2–3 first-party extensions.</p></div>
+                <div class="row"><span class="k">Styling</span><p>Tailwind v4 + daisyUI beneath a Kopling-owned Blade component library — the only official styling API (~25–30 components with behavior and accessibility built in). Runtime CSS-variable theming lets admins re-brand without a rebuild.</p></div>
+                <div class="row"><span class="k">Identity &amp; data</span><p>UUIDv7 everywhere; federated IDs are URIs with the UUID as local component. Every federatable row carries UUID + origin from migration #1 — remote content is first-class, never a shadow table. Non-negotiable: near-impossible to retrofit later.</p></div>
+                <div class="row"><span class="k">Federation</span><p>ActivityPub with forum-shaped conversation semantics, following the Discourse × NodeBB path. Delivery is a queue problem; remote media caching consumes the storage system below. Federation may ship post-1.0; schema readiness ships day one.</p></div>
+                <div class="row"><span class="k">Hosting posture</span><p>Graceful degradation: runs anywhere (sync queue, polling/SSE fallback, cron), shines on real infrastructure (Reverb, real queues). Capability detection is first-class — an admin health dashboard names what's degraded and why. Degradation is visible, never silent.</p></div>
+                <div class="row"><span class="k">Realtime &amp; mobile</span><p>SSE + WebSockets via htmx 4's first-party extensions; pushed fragments render through Blade, so they carry every extension's outlets automatically. PWA-first with Web Push at launch; a Hotwire-Native-style webview shell is the hedge if iOS friction proves costly.</p></div>
+                <div class="row"><span class="k">Databases</span><p>MySQL, MariaDB, Postgres, SQLite. SQL Server explicitly unsupported — every extra engine taxes every extension author forever. SQLite is strategic: trivial local dev and a genuine small-community tier.</p></div>
+                <div class="row"><span class="k">Search</span><p>v1 ships database <code>LIKE</code> behind a driver interface. The indexing pipeline — extensions registering searchable content types — is part of the contract from day one, since that's the part that's hard to retrofit.</p></div>
+                <div class="row"><span class="k">Storage</span><p>Capability-based named filesystems: extensions declare required capabilities (public URL, signed URL, streaming, cloud); admins define named instances and map requests to them. A thin layer over Flysystem.</p></div>
+                <div class="row"><span class="k">Registry</span><p>kopl.ing, Packagist-protocol-compatible — Composer resolution for free, registry sovereignty retained. Machine-checked compatibility metadata (core constraints, DB engines, declared overrides) and package signing from day one.</p></div>
+                <div class="row"><span class="k">Translations</span><p>Core-team-owned official infrastructure, never one volunteer's side project. Self-hosted Weblate or Tolgee, SSO'd to kopling.org; an automated pipeline carries strings from the registry to translators and back as installable language packs.</p></div>
+                <div class="row"><span class="k">APIs</span><p>Webhooks before a JSON API — cheaper, unblocks automation and bridges sooner. The API itself is deliberately deferred, kept cheap later by keeping controllers thin over action classes.</p></div>
+                <div class="row"><span class="k">AI</span><p>Agentic development can only be acceptable when properly reviewed, use AI as a planning assistant, and toolbox, not a replacement for a developer. </p></div>
+            </div>
+        </section>
+        <hr class="divider">
+
+        <section id="brand">
+            <span class="sec-num">Section 8</span>
+            <h2>Brand &amp; positioning</h2>
+            <p>Visual identity: Delft blue on porcelain, signal orange reserved for the follow/sponsor calls to action, a clutch-ring wordmark. Voice: confident but understated, inviting disagreement rather than silencing it — decisions are published before code so they can be challenged early.</p>
+            <p><strong>Naming discipline:</strong> verifiable anchors are named directly — Flarum, the Discourse × NodeBB federation conversations — as evidence of experience, not as comparison points. Employers and companies stay abstract, described by scale rather than brand ("one of Europe's largest fashion e-commerce platforms — a unicorn").</p>
+            <p><strong>Anti-copycat stance:</strong> the free license permits cloning the specification outright — that's the point of an open license. The moat was never the spec. It's a multi-decade dual-track career in enterprise engineering leadership and open source stewardship, the registry and translation infrastructure, and earned community trust — none of which a clone can paste in alongside the code.</p>
+            <p class="dim">Public identity: Daniël Klabbers · github.com/luceos · linkedin.com/in/luceos</p>
+        </section>
+        <hr class="divider">
+
+        <section id="working-with-claude">
+            <span class="sec-num">Section 9</span>
+            <h2>Working with AI</h2>
+            <p class="dim">Instructions for any AI assistant — Claude or otherwise — helping with Kopling.</p>
+            <ul>
+                <li>Treat sections 1–8 as decided. Don't relitigate unprompted — but push back when new information genuinely threatens a decision, and propose an explicit amendment rather than quietly overriding it.</li>
+                <li>Weigh the founder's lived engineering and open source experience as primary signal, above generic best-practice advice.</li>
+                <li>Apply the recurring pattern to any new dependency by default: <strong>mainstream tool inside, sovereign Kopling contract outside.</strong></li>
+                <li>Be honest and willing to disagree; name trade-offs explicitly rather than defaulting to agreement.</li>
+                <li>When governance discussions sound emotional, check for the reasoning rather than the emotion — without dismissing a conclusion merely because it's emotionally loaded.</li>
+                <li>In all public-facing drafts: use people-not-users vocabulary, stay forward-looking rather than comparative, and promise only what's actually settled — unresolved items get honest "being drafted in the open" language, not confident invention.</li>
+                <li>When a decision lands, propose the diff to this charter directly: keep the decision plus a one-line rationale, and move anything superseded to a note rather than deleting it outright.</li>
+`            </ul>
+        </section>
+        <hr class="divider">
+
+        <section id="open-questions">
+            <span class="sec-num">Section 10</span>
+            <h2>Open questions</h2>
+            <p class="dim">The backlog. Nothing here is decided — reference it, don't assume it.</p>
+
+            <div class="oq-group">
+                <h4>Governance &amp; legal</h4>
+                <div class="oq-item open"><span class="box"></span>Succession plan draft — shortest artifact on this list, hard pre-1.0 deadline, and it forces clarity on what transfers if the founder is unavailable. Recommended next.</div>
+                <div class="oq-item"><span class="box"></span>Timing and trigger conditions for creating the stichting, and which assets would move into it.</div>
+                <div class="oq-item"><span class="box"></span>Technical Steering Committee bootstrap: initial members, the advisory-to-binding trigger, charter text.</div>
+                <div class="oq-item"><span class="box"></span>Trademark registration and policy; CLA/DCO mechanics underpinning the no-relicensing promise.</div>
+                <div class="oq-item"><span class="box"></span>Exact cadence for financial statements and major-decision publication (Section 6).</div>
+                <div class="oq-item open"><span class="box"></span>Whether the AI doctrine (Section 2, item 6) joins the public governance commitments as a named seventh, or stays doctrine-only.</div>
+            </div>
+
+            <div class="oq-group">
+                <h4>Technical</h4>
+                <div class="oq-item"><span class="box"></span>Versioning and stability policy specifics — covered namespaces, deprecation windows, major-version support duration.</div>
+                <div class="oq-item"><span class="box"></span>The v1 <code>Kopling\Extend\*</code> contract list.</div>
+                <div class="oq-item"><span class="box"></span>The <code>&lt;x-k::*&gt;</code> component inventory (props, ~25–30 components).</div>
+                <div class="oq-item"><span class="box"></span>Outlet naming conventions and the outlet map for core views.</div>
+                <div class="oq-item"><span class="box"></span>Editor facade contract; mentions end-to-end (editor, rendering, notifications, federation).</div>
+                <div class="oq-item"><span class="box"></span>Registry namespace policy and signing implementation; Weblate vs. Tolgee selection.</div>
+                <div class="oq-item"><span class="box"></span>Media pipeline specifics; notification system design.</div>
+                <div class="oq-item open"><span class="box"></span>Reaction and acknowledgment mechanics — the principle is settled (Section 2, item 3), the exact mechanism (visible counts vs. author-only warmth) is not.</div>
+                <div class="oq-item"><span class="box"></span>Anti-abuse v1 scope.</div>
+            </div>
+
+            <div class="oq-group">
+                <h4>Product &amp; launch</h4>
+                <div class="oq-item"><span class="box"></span>Wire the landing page: mailing-list endpoint, additional sponsor channels, footer links, domain, founder photo.</div>
+                <div class="oq-item"><span class="box"></span>Public repository and decision-log location, linked directly from the landing page once it exists.</div>
+                <div class="oq-item"><span class="box"></span>v1 feature scope cut.</div>
+                <div class="oq-item"><span class="box"></span>First 2–3 first-party extensions, built before the extension API freezes.</div>
+            </div>
+        </section>
+        <hr class="divider">
+
+        <section id="decision-log">
+            <span class="sec-num">Section 11</span>
+            <h2>Decision log</h2>
+            <p class="dim">Abridged. Each row: what was decided, what it beat, and why.</p>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>#</th><th>Decision</th><th>Over</th><th>Key rationale</th></tr></thead>
+                    <tbody>
+                    <tr><td>D1</td><td>Full Laravel framework</td><td>Cherry-picked illuminate; Symfony</td><td>Avoids bespoke-kernel maintenance tax; common stack; ecosystem access</td></tr>
+                    <tr><td>D2</td><td>htmx 4 + Blade + Alpine</td><td>Livewire; Vue islands; pure Blade</td><td>Server-rendered is most extensible; avoids build-step disease</td></tr>
+                    <tr><td>D3</td><td>Component wrapper over raw hx-*</td><td>Raw htmx as the API</td><td>An htmx major becomes a Kopling minor</td></tr>
+                    <tr><td>D4</td><td>Tiptap, JSON-canonical, PHP-rendered</td><td>Markdown/BBCode; client-rendered HTML</td><td>One whitelist covers XSS and federation; no-build ESM nodes</td></tr>
+                    <tr><td>D5</td><td>Tailwind v4 + daisyUI under <code>&lt;x-k::*&gt;</code></td><td>Raw Tailwind; Basecoat; Bootstrap</td><td>Avoids the JIT trap; runtime theming; behavior lives in components</td></tr>
+                    <tr><td>D6</td><td>UUIDv7 + origin-aware schema</td><td>Auto-increment ints; UUIDv4</td><td>Index locality; federation-ready URIs; can't retrofit later</td></tr>
+                    <tr><td>D7</td><td>ActivityPub, forum-shaped</td><td>AT Protocol; microblog semantics</td><td>Discourse × NodeBB path; direct prior participation</td></tr>
+                    <tr><td>D8</td><td>Graceful-degradation hosting</td><td>VPS-only; hosted-only</td><td>Serves both small-community and enterprise ends honestly</td></tr>
+                    <tr><td>D9</td><td>kopl.ing registry, Packagist-compatible, signed</td><td>Raw Packagist; bespoke protocol</td><td>Free Composer resolution with retained sovereignty</td></tr>
+                    <tr><td>D10</td><td>4 databases, no SQL Server</td><td>Every engine Laravel supports</td><td>Each extra engine taxes every extension author forever</td></tr>
+                    <tr><td>D11</td><td>Core-owned translations, self-hosted platform</td><td>Build a bespoke platform; leave it volunteer-run</td><td>Bus-factor-1 was the actual failure, not the tooling</td></tr>
+                    <tr><td>D12</td><td>Founder-led + guarantees + TSC</td><td>Community ownership; foundation-first</td><td>Diffuse ownership caused the founding wounds, didn't prevent them</td></tr>
+                    <tr><td>D13</td><td>PWA-first, webview shell as hedge</td><td>Native apps; API-first mobile</td><td>HTML-over-the-wire makes the shell path free later</td></tr>
+                    <tr><td>D14</td><td>Webhooks before a JSON API</td><td>API-first</td><td>Cheaper now; thin action classes keep it cheap later too</td></tr>
+                    <tr><td>D15</td><td>Connection is the mission; immediacy is a means</td><td>Immediacy-first framing</td><td>Immediacy only matters because it serves authenticity</td></tr>
+                    <tr><td>D16</td><td>Engagement is a consequence, never a KPI</td><td>Engagement optimization</td><td>Optimizing it manufactures counterfeit enjoyment</td></tr>
+                    <tr><td>D17</td><td>Moderation addresses harm, not humanity; anti-abuse is core v1</td><td>Venting-as-violation; spam-as-exception</td><td>Bad days are coping, not offending; spam/bots are weather</td></tr>
+                    <tr><td>D18</td><td>AI serves people, never replaces them — visible, admin-controlled</td><td>Blanket AI ban; AI as participant</td><td>The human following is the actual success condition</td></tr>
+                    <tr><td>D19</td><td>"People, not users" vocabulary</td><td>Industry-default "users"</td><td>The person behind the account has emotions, struggles, hopes</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="amend-box">
+            <h4>Amending this charter</h4>
+            <p>This document is meant to be argued with. Read it first, challenge it explicitly, and when something changes, amend it deliberately — a proposed diff, a kept rationale, and a note for whatever it replaces, never a silent rewrite.</p>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <div class="wrap foot-inner">
+        <span class="wordmark" style="font-size:1.05rem">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</span>
+        <span>Made in the Netherlands, built for everywhere.</span>
+        <span><a href="index.html">Home</a> · <a href="index.html#support">Sponsor</a></span>
+    </div>
+</footer>
+
+<script>
+    (function(){
+        var sections = Array.from(document.querySelectorAll('.doc-body section[id]'));
+        var links = Array.from(document.querySelectorAll('.toc a'));
+        if (!('IntersectionObserver' in window) || !sections.length) return;
+        var byId = {};
+        links.forEach(function(l){ byId[l.getAttribute('href').slice(1)] = l; });
+        var observer = new IntersectionObserver(function(entries){
+            entries.forEach(function(entry){
+                var link = byId[entry.target.id];
+                if (!link) return;
+                if (entry.isIntersecting) {
+                    links.forEach(function(l){ l.classList.remove('active'); });
+                    link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(function(s){ observer.observe(s); });
+    })();
+</script>
+</body>
+</html>

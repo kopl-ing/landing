@@ -35,7 +35,6 @@
         .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
         .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
 
-        /* ---------- nav ---------- */
         .nav{position:sticky;top:0;z-index:50;background:rgba(22,41,94,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-light)}
         .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
         .nav a{text-decoration:none}
@@ -44,12 +43,10 @@
         .nav-links a:hover{color:#fff}
         .nav-links .btn{padding:.5em 1.1em}
 
-        /* wordmark: o as clutch rings */
         .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
         .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
         .wordmark.dark-on-light{color:var(--ink)}
 
-        /* ---------- buttons ---------- */
         .btn{display:inline-block;font-family:var(--body);font-weight:600;font-size:.95rem;text-decoration:none;border-radius:8px;padding:.72em 1.4em;border:1.5px solid transparent;cursor:pointer;transition:transform .12s ease,background .15s ease,color .15s ease}
         .btn:active{transform:translateY(1px)}
         .btn-signal{background:var(--signal);color:#fff}
@@ -59,7 +56,6 @@
         .btn-ink{background:var(--ink);color:var(--porcelain)}
         .btn-ink:hover{background:var(--delft-deep)}
 
-        /* ---------- hero ---------- */
         .hero{background:
                 radial-gradient(1100px 500px at 85% -10%, rgba(43,74,155,.55), transparent 60%),
                 linear-gradient(180deg, var(--delft-deep), var(--delft-night));
@@ -75,7 +71,6 @@
         .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
         .hero-note{margin-top:22px;font-family:var(--mono);font-size:.8rem;color:var(--glaze-dim)}
 
-        /* live thread demo */
         .thread{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:0 24px 60px rgba(6,12,32,.45);overflow:hidden;max-width:460px;justify-self:end;width:100%}
         .thread-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
         .thread-head strong{font-family:var(--display);font-weight:600;font-size:.95rem}
@@ -99,34 +94,29 @@
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
         .live-pill .dot{animation:pulse 2s infinite}
 
-        /* ---------- meaning strip ---------- */
         .meaning{background:var(--delft-night);color:var(--glaze);border-top:1px solid var(--line-light)}
         .meaning-inner{display:flex;gap:20px;align-items:baseline;padding:20px 0;flex-wrap:wrap}
         .meaning .word{font-family:var(--display);font-weight:600;font-size:1.05rem;color:var(--porcelain)}
         .meaning .def{font-size:.95rem}
         .meaning .def i{color:var(--glaze-dim)}
 
-        /* ---------- mission strip ---------- */
         .mission{background:var(--porcelain);padding:64px 0}
         .mission p.big{font-family:var(--display);font-weight:600;font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.35;letter-spacing:-.01em;max-width:30em}
         .mission p.big em{font-style:normal;color:var(--signal)}
         .mission p.small{margin-top:16px;color:#3A4358;font-size:1rem;max-width:44em}
 
-        /* ---------- sections ---------- */
         section{padding:88px 0}
         .section-head{max-width:44em;margin-bottom:48px}
         .section-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,3.4vw,2.5rem);letter-spacing:-.015em;line-height:1.1;margin:14px 0 14px}
         .section-head p{color:#3A4358;font-size:1.05rem}
         .section-head .eyebrow{color:var(--delft)}
 
-        /* principles */
         .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
         .principle{background:var(--paper);padding:30px 26px}
         .principle h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin-bottom:8px}
         .principle p{font-size:.93rem;color:#3A4358}
         .principle .p-mark{font-family:var(--mono);font-size:.75rem;color:var(--delft);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:14px}
 
-        /* ---------- spec sheet ---------- */
         .spec{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
         .spec-table{border:1px solid var(--line);border-radius:14px;overflow:hidden}
         .spec-row{display:grid;grid-template-columns:190px 1fr 1.15fr;border-bottom:1px solid var(--line)}
@@ -139,7 +129,6 @@
         .spec-why{font-size:.9rem;color:#3A4358;border-left:1px solid var(--line)}
         .spec-foot{font-family:var(--mono);font-size:.78rem;color:#5A6272;margin-top:18px}
 
-        /* ---------- extension callout ---------- */
         .devs .dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
         .devs h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.015em;line-height:1.12;margin:14px 0 16px}
         .devs p{color:#3A4358}
@@ -151,7 +140,6 @@
         .code .kw{color:#F2A07B}
         .code .st{color:#BFD3F2}
 
-        /* ---------- governance ---------- */
         .gov{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
         .commitment{display:grid;grid-template-columns:1fr 1.4fr;gap:32px;padding:26px 0;border-bottom:1px solid var(--line)}
         .commitment:last-of-type{border-bottom:none}
@@ -161,7 +149,6 @@
         .gov-foot p{font-size:.92rem;color:#3A4358;max-width:38em}
         @media (max-width:700px){.commitment{grid-template-columns:1fr;gap:8px}}
 
-        /* ---------- founder ---------- */
         .founder-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start}
         .founder h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.015em;line-height:1.12;margin:14px 0 16px}
         .founder .lede-p{color:#3A4358;font-size:1.02rem;margin-bottom:16px}
@@ -177,7 +164,6 @@
         @media (max-width:940px){.founder-grid{grid-template-columns:1fr}}
         @media (max-width:600px){.receipt{grid-template-columns:1fr}.receipt > p{padding:0 20px 16px}}
 
-        /* ---------- support ---------- */
         .support{background:
                 radial-gradient(900px 420px at 10% 0%, rgba(43,74,155,.5), transparent 60%),
                 linear-gradient(180deg, var(--delft-deep), var(--delft-night));
@@ -197,12 +183,10 @@
         .sponsor-row{display:flex;gap:12px;flex-wrap:wrap}
         .support .fineprint{margin-top:40px;font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim);max-width:52em}
 
-        /* ---------- footer ---------- */
         body > footer{color:var(--glaze-dim);background: var(--delft-night); border-top:1px solid var(--line-light)}
         .foot-inner{display:flex;justify-content:space-between;align-items:center;padding:28px 0;gap:20px;flex-wrap:wrap;font-size:.88rem}
         .foot-inner a{color:var(--glaze)}
 
-        /* ---------- responsive ---------- */
         @media (max-width:940px){
             .hero-grid{grid-template-columns:1fr;padding:64px 0 72px}
             .thread{justify-self:start;max-width:520px}
@@ -229,7 +213,6 @@
 </head>
 <body>
 
-<!-- ============ NAV ============ -->
 <nav class="nav" aria-label="Main">
     <div class="wrap nav-inner">
         <a href="#top" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
@@ -238,12 +221,12 @@
             <a href="#stack">The stack</a>
             <a href="#extend">Extend</a>
             <a href="#governance">Governance</a>
+            <a href="charter.html">Charter</a>
             <a href="#support" class="btn btn-signal">Sponsor</a>
         </div>
     </div>
 </nav>
 
-<!-- ============ HERO ============ -->
 <header class="hero" id="top">
     <div class="wrap hero-grid">
         <div>
@@ -257,7 +240,6 @@
             <p class="hero-note">In development · <a href="#founder" style="color:var(--glaze)">by whom?</a></p>
         </div>
 
-        <!-- live thread demo -->
         <div class="thread" role="img" aria-label="Demonstration of a Kopling discussion updating live: new replies appear as they are posted.">
             <div class="thread-head">
                 <strong>Pedal Builders · First solder joints</strong>
@@ -278,7 +260,6 @@
     </div>
 </header>
 
-<!-- ============ MEANING ============ -->
 <div class="meaning">
     <div class="wrap meaning-inner">
         <span class="word">kop·ling</span>
@@ -286,7 +267,6 @@
     </div>
 </div>
 
-<!-- ============ MISSION ============ -->
 <div class="mission">
     <div class="wrap">
         <p class="big">Kopling exists so human interaction can grow into <em>honest, real relationships</em> — through work, hobbies, friendship, or a stranger's well-intended answer at the right moment.</p>
@@ -294,7 +274,6 @@
     </div>
 </div>
 
-<!-- ============ PRINCIPLES ============ -->
 <section id="principles">
     <div class="wrap">
         <div class="section-head">
@@ -337,7 +316,6 @@
     </div>
 </section>
 
-<!-- ============ SPEC SHEET ============ -->
 <section id="stack" class="spec">
     <div class="wrap">
         <div class="section-head">
@@ -407,7 +385,6 @@
     </div>
 </section>
 
-<!-- ============ EXTENSION DEV ============ -->
 <section id="extend" class="devs">
     <div class="wrap dev-grid">
         <div>
@@ -433,7 +410,6 @@
     </div>
 </section>
 
-<!-- ============ GOVERNANCE ============ -->
 <section id="governance" class="gov">
     <div class="wrap">
         <div class="section-head">
@@ -445,6 +421,10 @@
         <div class="commitment">
             <h3>Founder-led, and it says so.</h3>
             <p>One person holds final say and is named. No pretend democracy, no diffuse ownership where accountability goes to die. Decisions follow a decide-by-default process: proposed in public, an objection window stated, the outcome and reasoning recorded in writing.</p>
+        </div>
+        <div class="commitment">
+            <h3>Built to outlive its founder.</h3>
+            <p>Founder-led must never mean founder-dependent. A written succession plan — what happens to the code, the trademark, the registry, and the infrastructure — is published before 1.0, so the project's future never rests on one person's availability.</p>
         </div>
         <div class="commitment">
             <h3>The license is your protection.</h3>
@@ -462,19 +442,14 @@
             <h3>A steering committee with real authority.</h3>
             <p>A technical steering committee, chartered with responsibilities of its own — binding say over the extension API contract, breaking-change policy, and deprecation windows. It starts small, earns scope as the contributor pool grows, and its remit is written down, not implied.</p>
         </div>
-        <div class="commitment">
-            <h3>Built to outlive its founder.</h3>
-            <p>Founder-led must never mean founder-dependent. A written succession plan — what happens to the code, the trademark, the registry, and the infrastructure — is published before 1.0, so the project's future never rests on one person's availability.</p>
-        </div>
 
         <div class="gov-foot">
             <p>The full governance charter — the steering committee's chartered responsibilities included — is being drafted in the open, in plain language, and will be adopted before the 1.0 release. It speaks of people, not users: people with real emotions, struggles, and hopes — including the occasional bad day. Kopling will govern itself on its own software: every decision, discussed and recorded on a Kopling instance.</p>
-            <a class="btn btn-ink" href="#support">Hold us to it</a>
+            <a class="btn btn-ink" href="charter.html#governance">Read the full charter</a>
         </div>
     </div>
 </section>
 
-<!-- ============ FOUNDER ============ -->
 <section id="founder" class="founder">
     <div class="wrap founder-grid">
         <div>
@@ -483,7 +458,7 @@
             <p class="lede-p">Anyone can publish a spec sheet. What can't be copied is the career that produced this one — two decades running on both tracks at once: engineering leadership in enterprise software by day, open source community stewardship the rest of the time. Kopling is where those tracks finally merge.</p>
             <p class="lede-p">Every commitment on this page is a lesson paid for in practice: the extension APIs that broke ecosystems, the governance that arrived too late, the hosting realities that make or break adoption, the maintainers who burned out unpaid. Kopling isn't a fresh idea — it's a second attempt, informed by all of it.</p>
             <blockquote>
-                “I've watched brilliant community software struggle for every reason except the code. Kopling is what I'd build knowing what I know now — and this time, the hard lessons are decided before the first release, not after.”
+                "I've watched brilliant community software struggle for every reason except the code. Kopling is what I'd build knowing what I know now — and this time, the hard lessons are decided before the first release, not after."
                 <footer>— Daniël Klabbers, building Kopling · <a href="https://github.com/luceos" style="color:var(--delft)">GitHub</a> · <a href="https://www.linkedin.com/in/luceos/" style="color:var(--delft)">LinkedIn</a></footer>
             </blockquote>
         </div>
@@ -498,7 +473,6 @@
     </div>
 </section>
 
-<!-- ============ SUPPORT ============ -->
 <section id="support" class="support">
     <div class="wrap">
         <div class="section-head">
@@ -508,45 +482,28 @@
         </div>
         <div class="support-grid">
             <div class="card">
-                <!--                <h3>Follow the build</h3>-->
-                <!--                <p>Development updates, design discussions, and the first public preview — a handful of emails, no noise.</p>-->
-                <!--                &lt;!&ndash; Wire this form to your mailing list provider: set the action URL and remove the JS intercept below. &ndash;&gt;-->
-                <!--                <form id="interest-form" action="#" method="post">-->
-                <!--                    <div class="field-row">-->
-                <!--                        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>-->
-                <!--                        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">-->
-                <!--                        <button type="submit" class="btn btn-signal">Keep me posted</button>-->
-                <!--                    </div>-->
-                <!--                    <p class="form-ok" id="form-ok">You're on the list. First update lands when there's something real to show.</p>-->
-                <!--                    <p class="form-note">No tracking, no resale, unsubscribe anytime.</p>-->
-                <!--                </form>-->
             </div>
             <div class="card">
                 <h3>Sponsor development</h3>
                 <p>Sponsorship funds core development, registry infrastructure, and the translation platform. Sponsors are credited on this site and in every release.</p>
                 <div class="sponsor-row">
-                    <!--                    <a class="btn btn-signal" href="#" rel="noopener">GitHub Sponsors</a>-->
                     <a class="btn btn-ghost" href="https://donate.stripe.com/6oU5kC8Z3a2qbBJ5M5cfK00" rel="noopener" target="_blank">Donate</a>
                 </div>
-                <!--                <p class="form-note" style="margin-top:18px">Considering a larger or corporate sponsorship? <a href="mailto:hello@kopl.ing" style="color:var(&#45;&#45;glaze)">hello@kopl.ing</a></p>-->
             </div>
         </div>
         <p class="fineprint">Per the governance commitments above: sponsorship buys recognition and gratitude, never authority. Budgets and spending will be published openly, at a regular cadence.</p>
     </div>
 </section>
 
-<!-- ============ FOOTER ============ -->
 <footer>
     <div class="wrap foot-inner">
         <span class="wordmark" style="font-size:1.05rem">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</span>
         <span>Made in the Netherlands, built for everywhere.</span>
-        <!--        <span><a href="https://github.com/kopl-ing">GitHub</a> · <a href="#">Fediverse</a> · <a href="mailto:hello@kopl.ing">Contact</a></span>-->
     </div>
 </footer>
 
 <script>
     (function(){
-        // ----- live thread demo -----
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var body = document.getElementById('thread-body');
         var typing = document.getElementById('typing');
@@ -582,17 +539,6 @@
             addPost(queue[0]); addPost(queue[1]);
         } else {
             setTimeout(tick, 2200);
-        }
-
-        // ----- interest form (guarded: form is currently commented out) -----
-        var form = document.getElementById('interest-form');
-        if(form){
-            form.addEventListener('submit', function(e){
-                e.preventDefault();
-                document.getElementById('form-ok').style.display = 'block';
-                form.querySelector('.field-row').style.display = 'none';
-                form.querySelector('.form-note').textContent = 'Demo form — connect it to your mailing list provider before launch.';
-            });
         }
     })();
 </script>
