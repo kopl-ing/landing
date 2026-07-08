@@ -71,7 +71,7 @@
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
         .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding-top:56px;padding-bottom:100px}
-        .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px}
+        .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px;max-height:calc(100vh - 110px);overflow-y:auto}
         .toc-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--delft);margin:16px 0 10px;display:block}
         .toc-label:first-child{margin-top:0}
         .toc a{display:block;font-size:.86rem;color:#3A4358;text-decoration:none;padding:5px 0;border-left:2px solid transparent;margin-left:-20px;padding-left:18px}
@@ -85,6 +85,7 @@
         .doc-body .sec-num{font-family:var(--mono);font-size:.78rem;color:var(--delft);letter-spacing:.08em;text-transform:uppercase}
         .doc-body section{margin-bottom:64px;padding-bottom:8px}
         .doc-body h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:28px 0 10px;letter-spacing:-.005em}
+        .doc-body h4.sub{font-family:var(--display);font-weight:600;font-size:1rem;margin:18px 0 6px}
         .doc-body p{color:#28304a;margin-bottom:14px;max-width:68ch}
         .doc-body p.dim{color:#5A6272;font-size:.92rem}
         .doc-body ul, .doc-body ol{margin:0 0 16px 1.3em;color:#28304a;max-width:68ch}
@@ -122,6 +123,13 @@
         .commit h4{font-family:var(--display);font-weight:600;font-size:1.02rem;margin-bottom:4px}
         .commit p{font-size:.92rem;margin-bottom:0}
 
+        .role-kind{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:12px;background:var(--paper)}
+        .role-kind h4{font-family:var(--display);font-weight:600;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+        .role-kind .vacant-tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--signal-dark);background:rgba(232,89,12,.1);border:1px solid rgba(232,89,12,.3);border-radius:6px;padding:.15em .55em}
+        .role-kind p{font-size:.9rem;margin-bottom:6px}
+        .role-kind .scope{font-size:.84rem;color:#5A6272}
+        .role-kind .scope b{color:var(--ink);font-weight:600}
+
         .dtable{width:100%;border-collapse:collapse;font-size:.86rem;margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
         .dtable th{background:var(--delft-night);color:var(--glaze);text-align:left;padding:10px 14px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
         .dtable td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top;color:#28304a}
@@ -146,7 +154,7 @@
 
         @media (max-width:900px){
             .doc-layout{grid-template-columns:1fr;gap:0}
-            .toc{position:static;border-left:none;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:36px}
+            .toc{position:static;border-left:none;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:36px;max-height:none}
             .toc a{margin-left:0}
             .nav-toggle{display:flex}
             .nav-links{position:absolute;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
@@ -186,6 +194,7 @@
             <span>Steward: <strong>Daniël Klabbers (luceos)</strong></span>
             <span>Status: <strong>Working draft</strong></span>
             <span>This page is the sole canonical charter</span>
+            <span>AI working instructions: <strong>CLAUDE.md</strong></span>
         </div>
     </div>
 </header>
@@ -197,17 +206,18 @@
         <a href="#doctrine">2. Doctrine</a>
         <a href="#governance">3. Governance model</a>
         <a href="#legal">4. Legal structure &amp; ownership</a>
-        <a href="#sustainability">5. Sustainable contribution</a>
-        <a href="#transparency">6. Transparency &amp; decisions</a>
+        <a href="#teams">5. Teams &amp; working groups</a>
+        <a href="#membership">6. Contributors, recognition &amp; membership</a>
+        <a href="#sustainability">7. Sustainable contribution</a>
+        <a href="#transparency">8. Transparency &amp; decisions</a>
 
         <span class="toc-label">Part B — Building Kopling</span>
-        <a href="#technical">7. Technical decisions</a>
-        <a href="#brand">8. Brand &amp; positioning</a>
+        <a href="#technical">9. Technical decisions</a>
+        <a href="#brand">10. Brand &amp; positioning</a>
 
         <span class="toc-label">Reference</span>
-        <a href="#working-with-claude">9. Working with Claude</a>
-        <a href="#open-questions">10. Open questions</a>
-        <a href="#decision-log">11. Decision log</a>
+        <a href="#open-questions">11. Open questions</a>
+        <a href="#decision-log">12. Decision log</a>
     </nav>
 
     <div class="doc-body">
@@ -298,54 +308,122 @@
         </section>
         <hr class="divider">
 
-        <section id="sustainability">
+        <section id="teams">
             <span class="sec-num">Section 5</span>
+            <h2>Teams &amp; working groups</h2>
+            <p>This section defines <em>kinds</em> of role in the project — not an org chart of who currently holds what, which changes constantly and belongs in a separate living document, not a charter that would need amending every time someone joins or steps back.</p>
+
+            <h3>Kinds of role</h3>
+            <div class="role-kind">
+                <h4>Founder <span class="vacant-tag" style="background:none;border:none;color:var(--delft);padding:0">— filled</span></h4>
+                <p>Final decision authority per Section 3; accountable for the succession plan and the project's overall direction.</p>
+                <p class="scope"><b>Scope:</b> everything not yet delegated. <b>Non-scope:</b> once a Technical Steering Committee forms, the extension API contract, breaking-change policy, and deprecation windows move to its binding authority (Section 3) and stop being the founder's to decide alone.</p>
+            </div>
+            <div class="role-kind">
+                <h4>Technical Steering Committee member <span class="vacant-tag">vacant — not yet formed</span></h4>
+                <p>Holds a named portfolio (for example: release stewardship, extension API stability, contributor sustainability) tied to a concrete, testable goal, per Section 3.</p>
+                <p class="scope"><b>Scope:</b> the portfolio's stated goal. <b>Non-scope:</b> everything outside it — a TSC member is not a general-purpose decision-maker for the whole project.</p>
+            </div>
+            <div class="role-kind">
+                <h4>Team lead <span class="vacant-tag">vacant — no teams yet</span></h4>
+                <p>Coordinates a specific area of ongoing work once one exists with more than one contributor — for example, translation coordination, extension review, or community moderation.</p>
+                <p class="scope"><b>Scope:</b> the named area. <b>Non-scope:</b> areas belonging to other teams; a team lead does not silently absorb undefined work (Section 7).</p>
+            </div>
+            <div class="role-kind">
+                <h4>Team member <span class="vacant-tag">vacant</span></h4>
+                <p>Participates in a specific team's ongoing work under its team lead.</p>
+                <p class="scope"><b>Scope:</b> the team's defined work. <b>Non-scope:</b> permanent personal ownership of any single piece of that work — baseline work rotates (Section 7).</p>
+            </div>
+            <div class="role-kind">
+                <h4>Contributor at large <span class="vacant-tag" style="background:none;border:none;color:var(--delft);padding:0">— open to anyone</span></h4>
+                <p>Anyone contributing code, triage, support, documentation, translation, moderation, or review without holding a named role. This is the entry point into the recognition ladder (Section 6).</p>
+                <p class="scope"><b>Scope:</b> whatever they choose to take on. <b>Non-scope:</b> none — this is deliberately the least bounded kind of role, since it's the easiest to enter and leave.</p>
+            </div>
+
+            <h3>The vacancy principle</h3>
+            <p>An unfilled role is a vacancy, not a defect, and is named openly as one. Right now, every kind of role above the founder is vacant — that's stated plainly here rather than hidden. Naming a role creates the empty chair the right person can step into; recruitment can't succeed if the role isn't visible in the first place.</p>
+
+            <h3>The Teams and Roles document</h3>
+            <p>Specific named roles below team-lead level, and who currently holds each — including every vacancy — will live in a separate, living <strong>Teams and Roles</strong> document once there's more than one contributor to list, published on kopl.ing or wherever Kopling's own community lives. Updates to that document never require a charter amendment; the charter stays stable, the team page stays current.</p>
+
+            <h3>Standing teams versus working groups</h3>
+            <p>A standing team carries ongoing responsibility (translation, moderation) and persists as long as the work does. A working group is time-boxed, formed for a defined task with a recognizable end (for example, drafting the v1 extension API contract), and dissolves once that task is done. Neither exists yet; both are described here so the shape is settled before the first one forms.</p>
+
+            <h3>Role concentration</h3>
+            <p>One person holding multiple critical roles is tracked as a bus-factor signal (Section 7), not treated as efficiency. Today, the founder holds every role by necessity — that concentration is total, and it's named as a condition to be deliberately reduced over time, not a steady state.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="membership">
+            <span class="sec-num">Section 6</span>
+            <h2>Contributors, recognition &amp; membership</h2>
+            <p>This section states, now, before there's a core to be closed, how standing in the project is earned. It's a deliberate repudiation of the closed-core model some open source projects drift into: closed contributor pools systematically fail to grow and concentrate burnout on whoever remains.</p>
+
+            <h3>Open and earned</h3>
+            <p>Standing in the project is earned through demonstrated contribution and is open to anyone — never gated on selection by an existing in-group. There is no inner circle that decides who's allowed to matter.</p>
+
+            <h3>Contribution is defined broadly</h3>
+            <p>Code counts. So do triage, support, documentation, translation, moderation, and review. Recognition that only counts authored commits misses most of what actually keeps a project alive, and makes invisible labor invisible twice over — once in the work, and once in the credit.</p>
+
+            <h3>Transparent, objective criteria</h3>
+            <p>Recognition is based on disclosed, countable, verifiable facts a person can point to in their own history — never on secret criteria, and never on an algorithm silently scoring the "quality" of someone's contribution. A cheap human appeals path exists for edge cases, so a genuine contributor — especially a non-native English speaker or a quiet contributor automation misjudges — isn't wrongly excluded by a rigid rule.</p>
+
+            <h3>Recognition today, voting later — one ladder, not two</h3>
+            <p>Right now, recognition means contributors are named, credited, and thanked publicly; it does not yet confer a vote, because there is no elected body to vote for. When the Technical Steering Committee (Section 3) forms, voting standing will be defined as a rung of this same contribution ladder — decided once, here, rather than invented twice as an unrelated afterthought once elections become real. Stating this now is what keeps the ladder from being redesigned under pressure later.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="sustainability">
+            <span class="sec-num">Section 7</span>
             <h2>Sustainable contribution &amp; load distribution</h2>
-            <p>Kopling's continued health depends on the wellbeing of the people who sustain it — today, primarily its founder; over time, its contributors. These principles are stated now, before they're tested by real scale, so the project doesn't invent its labor practices under pressure.</p>
+            <p>Kopling's continued health depends on the wellbeing of the people who sustain it — today, primarily its founder; over time, its contributors. These mechanisms are obligations on the project's structure, not on any individual's discipline: the burden of making rest possible belongs to the project, stated now, before scale makes it urgent.</p>
 
             <h3>Role and availability are separate</h3>
-            <p>Holding a role in the project never implies constant availability. Fluctuating availability is normal and expected, not a failure — for the founder today, and for any future contributor.</p>
+            <p>Holding a role never implies constant availability. Fluctuating availability is normal and expected, not a failure — for the founder today, and for any future contributor.</p>
 
             <h3>Activity states</h3>
             <p>As Kopling grows a contributor base, standing is described honestly by one of three states: <strong>active</strong> (the default), <strong>reduced-activity</strong> — a blameless, no-questions-asked pause that suspends duty obligations but keeps role, authority, and standing intact — and <strong>emeritus</strong>, which permanently honors what someone built without any ongoing obligation, and is always reversible. Public team listings distinguish active from emeritus honestly rather than presenting an inactive roster as a healthy one.</p>
 
-            <h3>Bus-factor honesty</h3>
-            <p>Kopling is, by necessity, bus-factor-1 today: one person holds critical knowledge and authority. That's named openly here rather than hidden. Its mitigation is the explicit job of two mechanisms already committed to elsewhere in this charter: the written succession plan (Section 4) and the eventual Technical Steering Committee (Section 3), whose chartered authority exists in part to end this bus-factor-1 state deliberately, on a timeline, rather than by accident.</p>
+            <h3>Bus-factor register</h3>
+            <p>The project maintains an honest, current list of every point where critical work depends on a single person — every "bus factor 1" — each with a stated plan to reduce the dependency, whether by widening the contributor pool, documenting and transferring knowledge, or, where genuinely unavoidable, formally accepting the risk with that acceptance recorded. <strong>Today, the register has exactly one entry: the entire project.</strong> Its stated mitigation plan is the succession plan (Section 4) and the eventual Technical Steering Committee (Section 3), whose chartered authority exists in part to end this bus-factor-1 state on a timeline, not by accident. Once there's a place for it to live publicly (a Kopling instance, per Section 8), the register itself becomes public.</p>
 
             <h3>Baseline work versus feature work</h3>
-            <p>Project-critical baseline work — security response, release mechanics, triage, dependency maintenance — is unbounded and recurring, and is where maintainer burnout concentrates, because it offers no natural completion. Feature work is bounded and discretionary and is never an obligation. Once a Technical Steering Committee or a broader contributor base exists, baseline work rotates through a duty roster rather than resting on one person indefinitely.</p>
+            <p>Project-critical baseline work — security response, release mechanics, triage, dependency maintenance — is unbounded and recurring, and is where maintainer burnout concentrates, because it offers no natural completion. Feature work is bounded, discretionary, and never an obligation. Once more than one person carries baseline work, it rotates through a <strong>duty roster</strong>: a named steward for a fixed window, public so coverage and any gaps in it are visible, with no obligation whatsoever on anyone outside their window. Until then, the founder carries all baseline work personally — named here explicitly as unsustainable if it remains permanent, not as a steady-state design goal.</p>
+
+            <h3>Bounded role scopes</h3>
+            <p>Every role defined in Section 5 carries a written scope <em>and</em> a written non-scope — what it is responsible for, and, just as importantly, what it explicitly is not. A role scoped as "everything not otherwise assigned" can never be finished and never grants the relief of being done. Work that falls outside every defined scope is the Technical Steering Committee's job to assign or explicitly defer once one exists — it does not default onto whoever feels most responsible.</p>
 
             <h3>Declining work and the legitimacy of slowness</h3>
             <p>Declining a proposal, or moving slowly, is normal and legitimate, and reflects on neither the person declining nor the person proposing. Sustainable slowness is preferred to unsustainable speed.</p>
 
             <h3>Recognition of invisible labor</h3>
-            <p>Once contribution and standing are formalized beyond the founder, they will account for all forms of sustaining work — triage, support, documentation, translation, moderation, and review — not only authored code. Work that goes unseen burns people out faster than work that's valued.</p>
+            <p>Standing under Section 6 accounts for all forms of sustaining work — triage, support, documentation, translation, moderation, and review — not only authored code. Work that goes unseen burns people out faster than work that's valued.</p>
         </section>
         <hr class="divider">
 
         <section id="transparency">
-            <span class="sec-num">Section 6</span>
+            <span class="sec-num">Section 8</span>
             <h2>Transparency &amp; decision-making</h2>
-            <p>Kopling's governance derives its legitimacy from being seen, not merely from being well-intentioned. This section makes that commitment concrete.</p>
+            <p>Kopling's governance derives its legitimacy from being seen, not merely from being well-intentioned. Governance that happens out of view forfeits that legitimacy regardless of the quality of its choices. This section makes the "public by default" commitment (Section 3) concrete.</p>
 
-            <h3>Public by default</h3>
-            <p>Decisions, their reasoning, and the project's finances are made and recorded in the open — this is already a governance commitment (Section 3); this section states how. Private handling is the narrow, named exception: matters concerning identifiable individuals, active legal matters, and security disclosures before a fix ships. Each exception is time-bounded, and once it lapses, a public summary follows.</p>
+            <h3>The default is public</h3>
+            <p>Decisions, their reasoning, and the project's finances are made and recorded in the open. Private handling is the narrow, named exception: matters concerning identifiable individuals, active legal matters, and security disclosures before a fix ships. Each exception is time-bounded, and once it lapses, a public summary follows.</p>
 
             <h3>Where governance happens</h3>
-            <p>Day-to-day discussion can happen anywhere. What must end up public is the <em>record</em> of a decision — the proposal, the reasoning, and the outcome — and that record lives on a Kopling instance itself. This is a small self-referential commitment: using Kopling to govern Kopling is a demonstration of trust in the tool, not just a policy.</p>
+            <p>Day-to-day discussion can happen anywhere. What must end up public is the <em>record</em> of a decision — the proposal, the reasoning, and the outcome — and that record lives on a Kopling instance itself, the way an equivalent community's governance would live on the community platform it governs. This is a small self-referential commitment: using Kopling to govern Kopling demonstrates trust in the tool, not just a policy about it.</p>
+
+            <h3>Conflict-of-interest register</h3>
+            <p>The moment any governance body beyond the founder exists — the Technical Steering Committee, a team lead, anyone with authority over a decision that could benefit them personally — conflict-of-interest disclosures by its members go into a public register. A disclosure visible only to the body it was made within is a courtesy, not an instrument of accountability; this register is what gives Section 6 and Section 7's mechanisms teeth once more than one person is involved.</p>
 
             <h3>Cadence</h3>
             <p>Financial statements and major decisions are published at a regular cadence. The exact cadence per artifact is not yet fixed — see Open Questions — but the commitment to a <em>regular, named</em> cadence, rather than an occasional one, is settled.</p>
-
-            <h3>As governance bodies grow</h3>
-            <p>If and when a Technical Steering Committee or any additional governance body is formed, conflict-of-interest disclosures by its members go into a public register, on the same "visible or it doesn't count" principle that applies to the founder today.</p>
         </section>
         <hr class="divider">
 
         <div class="part-banner"><span class="tag">Part B</span><span class="ttl">Building Kopling — what it's made of, and how it's positioned</span></div>
 
         <section id="technical">
-            <span class="sec-num">Section 7</span>
+            <span class="sec-num">Section 9</span>
             <h2>Technical decisions</h2>
             <p class="dim">Settled architecture. Recurring pattern applied throughout: <strong>mainstream tool inside, sovereign Kopling contract outside</strong> — so a dependency's major version becomes a Kopling minor, never an ecosystem-wide break.</p>
 
@@ -365,39 +443,22 @@
                 <div class="row"><span class="k">Registry</span><p>kopl.ing, Packagist-protocol-compatible — Composer resolution for free, registry sovereignty retained. Machine-checked compatibility metadata (core constraints, DB engines, declared overrides) and package signing from day one.</p></div>
                 <div class="row"><span class="k">Translations</span><p>Core-team-owned official infrastructure, never one volunteer's side project. Self-hosted Weblate or Tolgee, SSO'd to kopling.org; an automated pipeline carries strings from the registry to translators and back as installable language packs.</p></div>
                 <div class="row"><span class="k">APIs</span><p>Webhooks before a JSON API — cheaper, unblocks automation and bridges sooner. The API itself is deliberately deferred, kept cheap later by keeping controllers thin over action classes.</p></div>
-                <div class="row"><span class="k">AI</span><p>Agentic development can only be acceptable when properly reviewed, use AI as a planning assistant, and toolbox, not a replacement for a developer. </p></div>
+                <div class="row"><span class="k">AI</span><p>Agentic development can only be acceptable when properly reviewed, use AI as a planning assistant, and toolbox, not a replacement for a developer.</p></div>
             </div>
         </section>
         <hr class="divider">
 
         <section id="brand">
-            <span class="sec-num">Section 8</span>
+            <span class="sec-num">Section 10</span>
             <h2>Brand &amp; positioning</h2>
             <p>Visual identity: Delft blue on porcelain, signal orange reserved for the follow/sponsor calls to action, a clutch-ring wordmark. Voice: confident but understated, inviting disagreement rather than silencing it — decisions are published before code so they can be challenged early.</p>
-            <p><strong>Naming discipline:</strong> verifiable anchors are named directly — Flarum, the Discourse × NodeBB federation conversations — as evidence of experience, not as comparison points. Employers and companies stay abstract, described by scale rather than brand ("one of Europe's largest fashion e-commerce platforms — a unicorn").</p>
             <p><strong>Anti-copycat stance:</strong> the free license permits cloning the specification outright — that's the point of an open license. The moat was never the spec. It's a multi-decade dual-track career in enterprise engineering leadership and open source stewardship, the registry and translation infrastructure, and earned community trust — none of which a clone can paste in alongside the code.</p>
             <p class="dim">Public identity: Daniël Klabbers · github.com/luceos · linkedin.com/in/luceos</p>
         </section>
         <hr class="divider">
 
-        <section id="working-with-claude">
-            <span class="sec-num">Section 9</span>
-            <h2>Working with AI</h2>
-            <p class="dim">Instructions for any AI assistant — Claude or otherwise — helping with Kopling.</p>
-            <ul>
-                <li>Treat sections 1–8 as decided. Don't relitigate unprompted — but push back when new information genuinely threatens a decision, and propose an explicit amendment rather than quietly overriding it.</li>
-                <li>Weigh the founder's lived engineering and open source experience as primary signal, above generic best-practice advice.</li>
-                <li>Apply the recurring pattern to any new dependency by default: <strong>mainstream tool inside, sovereign Kopling contract outside.</strong></li>
-                <li>Be honest and willing to disagree; name trade-offs explicitly rather than defaulting to agreement.</li>
-                <li>When governance discussions sound emotional, check for the reasoning rather than the emotion — without dismissing a conclusion merely because it's emotionally loaded.</li>
-                <li>In all public-facing drafts: use people-not-users vocabulary, stay forward-looking rather than comparative, and promise only what's actually settled — unresolved items get honest "being drafted in the open" language, not confident invention.</li>
-                <li>When a decision lands, propose the diff to this charter directly: keep the decision plus a one-line rationale, and move anything superseded to a note rather than deleting it outright.</li>
-            </ul>
-        </section>
-        <hr class="divider">
-
         <section id="open-questions">
-            <span class="sec-num">Section 10</span>
+            <span class="sec-num">Section 11</span>
             <h2>Open questions</h2>
             <p class="dim">The backlog. Nothing here is decided — reference it, don't assume it.</p>
 
@@ -407,7 +468,10 @@
                 <div class="oq-item"><span class="box"></span>Timing and trigger conditions for creating the stichting, and which assets would move into it.</div>
                 <div class="oq-item"><span class="box"></span>Technical Steering Committee bootstrap: initial members, the advisory-to-binding trigger, charter text.</div>
                 <div class="oq-item"><span class="box"></span>Trademark registration and policy; CLA/DCO mechanics underpinning the no-relicensing promise.</div>
-                <div class="oq-item"><span class="box"></span>Exact cadence for financial statements and major-decision publication (Section 6).</div>
+                <div class="oq-item"><span class="box"></span>Exact cadence for financial statements and major-decision publication (Section 8).</div>
+                <div class="oq-item"><span class="box"></span>The precise countable criteria for the contribution ladder (Section 6): thresholds, grant/lapse rules, and resistance to gaming.</div>
+                <div class="oq-item"><span class="box"></span>Role-concentration cap: how many critical roles one person may hold at once, once Section 5's roles start being populated.</div>
+                <div class="oq-item"><span class="box"></span>Format and hosting location of the living Teams and Roles document (Section 5).</div>
                 <div class="oq-item open"><span class="box"></span>Whether the AI doctrine (Section 2, item 6) joins the public governance commitments as a named seventh, or stays doctrine-only.</div>
             </div>
 
@@ -435,7 +499,7 @@
         <hr class="divider">
 
         <section id="decision-log">
-            <span class="sec-num">Section 11</span>
+            <span class="sec-num">Section 12</span>
             <h2>Decision log</h2>
             <p class="dim">Abridged. Each row: what was decided, what it beat, and why.</p>
             <div class="table-scroll">
@@ -461,6 +525,10 @@
                     <tr><td>D17</td><td>Moderation addresses harm, not humanity; anti-abuse is core v1</td><td>Venting-as-violation; spam-as-exception</td><td>Bad days are coping, not offending; spam/bots are weather</td></tr>
                     <tr><td>D18</td><td>AI serves people, never replaces them — visible, admin-controlled</td><td>Blanket AI ban; AI as participant</td><td>The human following is the actual success condition</td></tr>
                     <tr><td>D19</td><td>"People, not users" vocabulary</td><td>Industry-default "users"</td><td>The person behind the account has emotions, struggles, hopes</td></tr>
+                    <tr><td>D20</td><td>Open and earned standing, never gated by an in-group</td><td>Closed-core / invite-only contributor model</td><td>Closed pools fail to grow and concentrate burnout on who's left</td></tr>
+                    <tr><td>D21</td><td>Contribution defined broadly (code, triage, docs, translation, moderation, review)</td><td>Code-only recognition</td><td>Fixes the invisible-labor gap; recognition should match what actually sustains the project</td></tr>
+                    <tr><td>D22</td><td>Roles are kinds, not a fixed org chart; vacancy named openly; specifics live in a separate Teams and Roles document</td><td>Enumerating every named role in the charter itself</td><td>Charter stays stable; the team page stays current; an unfilled role is a recruitment target, not an embarrassment</td></tr>
+                    <tr><td>D23</td><td>Voting standing deferred until a TSC exists, but built on the same contribution ladder as recognition</td><td>Inventing a separate electorate definition later</td><td>Designing one ladder now avoids redesigning it under pressure once elections become real</td></tr>
                     </tbody>
                 </table>
             </div>
