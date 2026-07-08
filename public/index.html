@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kopling — software that turns interaction into relationship</title>
+    <title>Kopling — community software that turns interaction into relationship</title>
     <meta name="description" content="Kopling is open source, federated, mobile-first community software built so human interaction can grow into honest, real relationships. Follow the build or sponsor development.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,6 +42,8 @@
         .nav-links a{color:var(--glaze);font-size:.92rem;font-weight:500}
         .nav-links a:hover{color:#fff}
         .nav-links .btn{padding:.5em 1.1em}
+        .nav-toggle{display:none;background:none;border:none;color:var(--porcelain);cursor:pointer;padding:8px;align-items:center;justify-content:center;border-radius:6px}
+        .nav-toggle:hover{background:rgba(255,255,255,.08)}
 
         .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
         .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
@@ -63,7 +65,7 @@
         .hero::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
             background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23D9E2F1' stroke-width='1'%3E%3Cpath d='M0 12 Q12 12 12 0 M84 0 Q84 12 96 12 M96 84 Q84 84 84 96 M12 96 Q12 84 0 84'/%3E%3C/g%3E%3C/svg%3E");
             background-size:96px 96px}
-        .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:88px 0 96px;position:relative}
+        .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-top:88px;padding-bottom:96px;position:relative}
         .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,5vw,3.7rem);line-height:1.04;letter-spacing:-.02em;margin:18px 0 20px}
         .hero h1 em{font-style:normal;color:var(--signal)}
         .hero p.lede{font-size:1.13rem;color:var(--glaze);max-width:34em}
@@ -71,7 +73,9 @@
         .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
         .hero-note{margin-top:22px;font-family:var(--mono);font-size:.8rem;color:var(--glaze-dim)}
 
-        .thread{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:0 24px 60px rgba(6,12,32,.45);overflow:hidden;max-width:460px;justify-self:end;width:100%}
+        .thread-col{justify-self:end;width:100%;max-width:460px}
+        .thread{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:0 24px 60px rgba(6,12,32,.45);overflow:hidden;max-width:460px;width:100%}
+        .thread-caption{font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim);margin-top:14px;max-width:460px;text-align:right}
         .thread-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
         .thread-head strong{font-family:var(--display);font-weight:600;font-size:.95rem}
         .live-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--delft)}
@@ -95,7 +99,7 @@
         .live-pill .dot{animation:pulse 2s infinite}
 
         .meaning{background:var(--delft-night);color:var(--glaze);border-top:1px solid var(--line-light)}
-        .meaning-inner{display:flex;gap:20px;align-items:baseline;padding:20px 0;flex-wrap:wrap}
+        .meaning-inner{display:flex;gap:20px;align-items:baseline;padding-top:20px;padding-bottom:20px;flex-wrap:wrap}
         .meaning .word{font-family:var(--display);font-weight:600;font-size:1.05rem;color:var(--porcelain)}
         .meaning .def{font-size:.95rem}
         .meaning .def i{color:var(--glaze-dim)}
@@ -104,6 +108,17 @@
         .mission p.big{font-family:var(--display);font-weight:600;font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.35;letter-spacing:-.01em;max-width:30em}
         .mission p.big em{font-style:normal;color:var(--signal)}
         .mission p.small{margin-top:16px;color:#3A4358;font-size:1rem;max-width:44em}
+
+        .whatis{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+        .whatis-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+        .whatis h2{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.015em;line-height:1.15;margin:14px 0 16px}
+        .whatis p.lede{font-size:1.05rem;color:#28304a;margin-bottom:0}
+        .feature-list{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+        .feature{background:var(--porcelain);padding:18px 22px;display:flex;gap:16px;align-items:flex-start}
+        .feature .fi{font-family:var(--mono);font-size:.72rem;color:#fff;background:var(--delft);border-radius:6px;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+        .feature h4{font-family:var(--display);font-weight:600;font-size:.98rem;margin-bottom:3px}
+        .feature p{font-size:.88rem;color:#3A4358;margin-bottom:0}
+        @media (max-width:900px){.whatis-grid{grid-template-columns:1fr}}
 
         section{padding:88px 0}
         .section-head{max-width:44em;margin-bottom:48px}
@@ -184,12 +199,14 @@
         .support .fineprint{margin-top:40px;font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim);max-width:52em}
 
         body > footer{color:var(--glaze-dim);background: var(--delft-night); border-top:1px solid var(--line-light)}
-        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding:28px 0;gap:20px;flex-wrap:wrap;font-size:.88rem}
+        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:28px;gap:20px;flex-wrap:wrap;font-size:.88rem}
         .foot-inner a{color:var(--glaze)}
 
         @media (max-width:940px){
-            .hero-grid{grid-template-columns:1fr;padding:64px 0 72px}
-            .thread{justify-self:start;max-width:520px}
+            .hero-grid{grid-template-columns:1fr;padding-top:64px;padding-bottom:72px}
+            .thread-col{justify-self:start;max-width:520px}
+            .thread{max-width:520px}
+            .thread-caption{text-align:left;max-width:520px}
             .principles{grid-template-columns:1fr 1fr}
             .devs .dev-grid{grid-template-columns:1fr}
             .support-grid{grid-template-columns:1fr}
@@ -200,8 +217,16 @@
             .principles{grid-template-columns:1fr}
             .spec-row{grid-template-columns:1fr}
             .spec-key{padding-bottom:0 !important}
-            .nav-links a:not(.btn){display:none}
             section{padding:64px 0}
+        }
+        @media (max-width:860px){
+            .nav-toggle{display:flex}
+            .nav-links{position:absolute;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
+                background:var(--delft-night);border-bottom:1px solid var(--line-light);
+                padding:8px 0 16px;max-height:0;overflow:hidden;visibility:hidden}
+            .nav-links.open{max-height:80vh;overflow-y:auto;visibility:visible}
+            .nav-links a{padding:14px 24px;width:100%;box-sizing:border-box}
+            .nav-links a.btn{margin:12px 24px 4px;width:auto;text-align:center}
         }
         @media (prefers-reduced-motion:reduce){
             html{scroll-behavior:auto}
@@ -216,7 +241,8 @@
 <nav class="nav" aria-label="Main">
     <div class="wrap nav-inner">
         <a href="#top" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
-        <div class="nav-links">
+        <div class="nav-links" id="nav-menu">
+            <a href="#whatis">What it is</a>
             <a href="#principles">Principles</a>
             <a href="#stack">The stack</a>
             <a href="#extend">Extend</a>
@@ -224,6 +250,9 @@
             <a href="charter.html">Charter</a>
             <a href="#support" class="btn btn-signal">Sponsor</a>
         </div>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
     </div>
 </nav>
 
@@ -231,7 +260,7 @@
     <div class="wrap hero-grid">
         <div>
             <span class="eyebrow">Open source · Federated · Mobile-first</span>
-            <h1>Software that turns interaction into <em>relationship</em>.</h1>
+            <h1>Community software that turns interaction into <em>relationship</em>.</h1>
             <p class="lede">People are the engine. Kopling is the clutch: community software that engages the energy people already bring — sharing the moment while it's still a moment, welcoming the very first post, keeping every conversation whole — so interaction can grow into honest, real connection.</p>
             <div class="hero-ctas">
                 <a class="btn btn-signal" href="#support">Follow the build</a>
@@ -240,22 +269,25 @@
             <p class="hero-note">In development · <a href="#founder" style="color:var(--glaze)">by whom?</a></p>
         </div>
 
-        <div class="thread" role="img" aria-label="Demonstration of a Kopling discussion updating live: new replies appear as they are posted.">
-            <div class="thread-head">
-                <strong>Pedal Builders · First solder joints</strong>
-                <span class="live-pill"><span class="dot"></span>Live</span>
-            </div>
-            <div class="thread-body" id="thread-body">
-                <div class="post">
-                    <span class="avatar" style="background:#2B4A9B">MV</span>
-                    <div><div class="meta"><b>Mara</b> · 2m</div><p>Finished the fuzz circuit tonight — first pedal that didn't hum. Posting the board photos now.</p></div>
+        <div class="thread-col">
+            <div class="thread" role="img" aria-label="Demonstration of a Kopling discussion updating live: new replies appear as they are posted.">
+                <div class="thread-head">
+                    <strong>Pedal Builders · First solder joints</strong>
+                    <span class="live-pill"><span class="dot"></span>Live</span>
                 </div>
-                <div class="post">
-                    <span class="avatar" style="background:#E8590C">JD</span>
-                    <div><div class="meta"><b>Jonas</b> · 1m</div><p>That was fast. Which transistors did you end up using?</p></div>
+                <div class="thread-body" id="thread-body">
+                    <div class="post">
+                        <span class="avatar" style="background:#2B4A9B">MV</span>
+                        <div><div class="meta"><b>Mara</b> · 2m</div><p>Finished the fuzz circuit tonight — first pedal that didn't hum. Posting the board photos now.</p></div>
+                    </div>
+                    <div class="post">
+                        <span class="avatar" style="background:#E8590C">JD</span>
+                        <div><div class="meta"><b>Jonas</b> · 1m</div><p>That was fast. Which transistors did you end up using?</p></div>
+                    </div>
+                    <div class="typing" id="typing" hidden><span></span><span></span><span></span></div>
                 </div>
-                <div class="typing" id="typing" hidden><span></span><span></span><span></span></div>
             </div>
+            <p class="thread-caption">A real discussion on a Kopling community — replies appear live, no refresh needed.</p>
         </div>
     </div>
 </header>
@@ -273,6 +305,24 @@
         <p class="small">That's why we build for people, not "users". People have real emotions, struggles, and hopes — good days and bad ones. Engagement is what happens when people enjoy each other; it's a consequence we welcome, never a metric we optimize.</p>
     </div>
 </div>
+
+<section id="whatis" class="whatis">
+    <div class="wrap whatis-grid">
+        <div>
+            <span class="eyebrow" style="color:var(--delft)">What Kopling is</span>
+            <h2>A community platform, reimagined as a forum that feels alive.</h2>
+            <p class="lede">Kopling is open source software you install on your own server to run a community — the same role a forum has played for decades, rebuilt for how people actually talk online today. Members start threaded discussions, reply, and react; nothing here is a chat app or a social feed you don't control.</p>
+        </div>
+        <div class="feature-list">
+            <div class="feature"><span class="fi">1</span><div><h4>Threaded discussions</h4><p>Conversations stay organized and easy to follow, not scattered across a feed.</p></div></div>
+            <div class="feature"><span class="fi">2</span><div><h4>Replies appear live</h4><p>No refresh button. A new reply shows up the moment someone posts it — like the demo above.</p></div></div>
+            <div class="feature"><span class="fi">3</span><div><h4>Lightweight reactions</h4><p>A quick "this is cool" counts as a real response — warmth doesn't require writing an essay.</p></div></div>
+            <div class="feature"><span class="fi">4</span><div><h4>Connected to other communities</h4><p>A Kopling community can talk to other Kopling sites — and to Mastodon and the wider fediverse — so a conversation isn't trapped behind one site's login.</p></div></div>
+            <div class="feature"><span class="fi">5</span><div><h4>Yours to run</h4><p>Install it on your own server or hosting, own your community's data, and shape it with extensions — no platform can shut it down or change the rules on you.</p></div></div>
+            <div class="feature"><span class="fi">6</span><div><h4>Built for phones</h4><p>Fast on a weak connection, installable like an app, with real push notifications — not a desktop tool squeezed onto a small screen.</p></div></div>
+        </div>
+    </div>
+</section>
 
 <section id="principles">
     <div class="wrap">
@@ -502,6 +552,23 @@
     </div>
 </footer>
 
+<script>
+    (function(){
+        var toggle = document.getElementById('nav-toggle');
+        var menu = document.getElementById('nav-menu');
+        if(!toggle || !menu) return;
+        toggle.addEventListener('click', function(){
+            var isOpen = menu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        menu.querySelectorAll('a').forEach(function(a){
+            a.addEventListener('click', function(){
+                menu.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    })();
+</script>
 <script>
     (function(){
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -42,6 +42,8 @@
         .nav-links a{color:var(--glaze);font-size:.9rem;font-weight:500}
         .nav-links a:hover{color:#fff}
         .nav-links .btn{padding:.5em 1.1em}
+        .nav-toggle{display:none;background:none;border:none;color:var(--porcelain);cursor:pointer;padding:8px;align-items:center;justify-content:center;border-radius:6px}
+        .nav-toggle:hover{background:rgba(255,255,255,.08)}
         .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
         .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
 
@@ -68,7 +70,7 @@
         .live-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-        .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding:56px 0 100px}
+        .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding-top:56px;padding-bottom:100px}
         .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px}
         .toc-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--delft);margin:16px 0 10px;display:block}
         .toc-label:first-child{margin-top:0}
@@ -139,14 +141,20 @@
         .amend-box p{color:var(--glaze);font-size:.92rem;margin-bottom:0}
 
         footer{background:var(--delft-night);color:var(--glaze-dim);border-top:1px solid var(--line-light)}
-        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding:28px 0;gap:20px;flex-wrap:wrap;font-size:.86rem}
+        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:28px;gap:20px;flex-wrap:wrap;font-size:.86rem}
         .foot-inner a{color:var(--glaze)}
 
         @media (max-width:900px){
             .doc-layout{grid-template-columns:1fr;gap:0}
             .toc{position:static;border-left:none;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:36px}
             .toc a{margin-left:0}
-            .nav-links a:not(.btn){display:none}
+            .nav-toggle{display:flex}
+            .nav-links{position:absolute;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
+                background:var(--delft-night);border-bottom:1px solid var(--line-light);
+                padding:8px 0 16px;max-height:0;overflow:hidden;visibility:hidden}
+            .nav-links.open{max-height:80vh;overflow-y:auto;visibility:visible}
+            .nav-links a{padding:14px 24px;width:100%;box-sizing:border-box}
+            .nav-links a.btn{margin:12px 24px 4px;width:auto;text-align:center}
         }
     </style>
 </head>
@@ -155,12 +163,16 @@
 <nav class="nav" aria-label="Main">
     <div class="wrap nav-inner">
         <a href="index.html" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
-        <div class="nav-links">
+        <div class="nav-links" id="nav-menu">
+            <a href="index.html#whatis">What it is</a>
             <a href="index.html#stack">The stack</a>
             <a href="index.html#governance">Governance</a>
             <a href="charter.html" style="color:#fff">Charter</a>
             <a href="index.html#support" class="btn btn-signal">Sponsor</a>
         </div>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
     </div>
 </nav>
 
@@ -380,7 +392,7 @@
                 <li>When governance discussions sound emotional, check for the reasoning rather than the emotion — without dismissing a conclusion merely because it's emotionally loaded.</li>
                 <li>In all public-facing drafts: use people-not-users vocabulary, stay forward-looking rather than comparative, and promise only what's actually settled — unresolved items get honest "being drafted in the open" language, not confident invention.</li>
                 <li>When a decision lands, propose the diff to this charter directly: keep the decision plus a one-line rationale, and move anything superseded to a note rather than deleting it outright.</li>
-`            </ul>
+            </ul>
         </section>
         <hr class="divider">
 
@@ -470,6 +482,23 @@
     </div>
 </footer>
 
+<script>
+    (function(){
+        var toggle = document.getElementById('nav-toggle');
+        var menu = document.getElementById('nav-menu');
+        if(!toggle || !menu) return;
+        toggle.addEventListener('click', function(){
+            var isOpen = menu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        menu.querySelectorAll('a').forEach(function(a){
+            a.addEventListener('click', function(){
+                menu.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    })();
+</script>
 <script>
     (function(){
         var sections = Array.from(document.querySelectorAll('.doc-body section[id]'));
