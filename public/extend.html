@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extending Kopling</title>
+    <meta name="description" content="How to build a Kopling extension: paths, conventions, and the Extension contract. A living document, revised as the extension system grows.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --ink:#0E1A38;
+            --delft:#2B4A9B;
+            --delft-deep:#16295E;
+            --delft-night:#0F1E47;
+            --porcelain:#F2F4F3;
+            --paper:#FBFCFC;
+            --glaze:#D9E2F1;
+            --glaze-dim:#A9BCDE;
+            --signal:#E8590C;
+            --signal-dark:#C74A08;
+            --line:rgba(14,26,56,.14);
+            --line-light:rgba(217,226,241,.18);
+            --display:"Bricolage Grotesque",system-ui,sans-serif;
+            --body:"Instrument Sans",system-ui,sans-serif;
+            --mono:"Spline Sans Mono",ui-monospace,monospace;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:var(--body);color:var(--ink);background:var(--porcelain);line-height:1.6;font-size:17px}
+        img,svg{display:block}
+        a{color:var(--delft)}
+        :focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:2px}
+        .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+        .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+
+        .nav{position:sticky;top:0;z-index:50;background:rgba(22,41,94,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-light)}
+        .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+        .nav a{text-decoration:none}
+        .nav-links{display:flex;gap:24px;align-items:center}
+        .nav-links a{color:var(--glaze);font-size:.9rem;font-weight:500}
+        .nav-links a:hover{color:#fff}
+        .nav-links .btn{padding:.5em 1.1em}
+        .nav-toggle{display:none;background:none;border:none;color:var(--porcelain);cursor:pointer;padding:8px;align-items:center;justify-content:center;border-radius:6px}
+        .nav-toggle:hover{background:rgba(255,255,255,.08)}
+        .wordmark{display:inline-flex;align-items:baseline;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--porcelain);letter-spacing:-.01em}
+        .wordmark .ring{width:.72em;height:.72em;margin:0 .04em;align-self:center;transform:translateY(.05em)}
+
+        .btn{display:inline-block;font-family:var(--body);font-weight:600;font-size:.9rem;text-decoration:none;border-radius:8px;padding:.6em 1.2em;border:1.5px solid transparent;cursor:pointer;transition:transform .12s ease,background .15s ease,color .15s ease}
+        .btn:active{transform:translateY(1px)}
+        .btn-signal{background:var(--signal);color:#fff}
+        .btn-signal:hover{background:var(--signal-dark)}
+        .btn-ghost{border-color:var(--glaze-dim);color:var(--glaze)}
+        .btn-ghost:hover{border-color:var(--porcelain);color:#fff}
+
+        .dhero{background:
+                radial-gradient(1100px 460px at 85% -10%, rgba(43,74,155,.55), transparent 60%),
+                linear-gradient(180deg, var(--delft-deep), var(--delft-night));
+            color:var(--porcelain);position:relative;overflow:hidden;padding:72px 0 56px}
+        .dhero::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23D9E2F1' stroke-width='1'%3E%3Cpath d='M0 12 Q12 12 12 0 M84 0 Q84 12 96 12 M96 84 Q84 84 84 96 M12 96 Q12 84 0 84'/%3E%3C/g%3E%3C/svg%3E");
+            background-size:96px 96px}
+        .dhero-inner{position:relative}
+        .dhero h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.2vw,3rem);line-height:1.06;letter-spacing:-.02em;margin:16px 0 16px}
+        .dhero p.lede{font-size:1.08rem;color:var(--glaze);max-width:42em}
+        .doc-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim)}
+        .doc-meta strong{color:var(--porcelain);font-weight:600}
+        .live-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--glaze-dim);border:1px solid var(--line-light);border-radius:99px;padding:.35em .9em;margin-top:22px}
+        .live-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+        .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding-top:56px;padding-bottom:100px}
+        .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px;max-height:calc(100vh - 110px);overflow-y:auto}
+        .toc-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--delft);margin:16px 0 10px;display:block}
+        .toc-label:first-child{margin-top:0}
+        .toc a{display:block;font-size:.86rem;color:#3A4358;text-decoration:none;padding:5px 0;border-left:2px solid transparent;margin-left:-20px;padding-left:18px}
+        .toc a:hover, .toc a.active{color:var(--delft);border-left-color:var(--signal)}
+
+        .doc-body h2{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,2.6vw,1.9rem);letter-spacing:-.015em;margin:0 0 6px;scroll-margin-top:90px}
+        .doc-body .sec-num{font-family:var(--mono);font-size:.78rem;color:var(--delft);letter-spacing:.08em;text-transform:uppercase}
+        .doc-body section{margin-bottom:64px;padding-bottom:8px}
+        .doc-body h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:28px 0 10px;letter-spacing:-.005em}
+        .doc-body h4.sub{font-family:var(--display);font-weight:600;font-size:1rem;margin:18px 0 6px}
+        .doc-body p{color:#28304a;margin-bottom:14px;max-width:68ch}
+        .doc-body p.dim{color:#5A6272;font-size:.92rem}
+        .doc-body ul, .doc-body ol{margin:0 0 16px 1.3em;color:#28304a;max-width:68ch}
+        .doc-body li{margin-bottom:8px}
+        .doc-body code{font-family:var(--mono);font-size:.85em;background:var(--glaze);color:var(--delft-deep);padding:.15em .4em;border-radius:4px}
+        .doc-body strong{font-weight:600;color:var(--ink)}
+        .doc-body a{text-decoration:underline;text-decoration-color:var(--glaze-dim);text-underline-offset:2px}
+        .divider{border:none;border-top:1px solid var(--line);margin:0 0 40px}
+
+        .mission-block{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--signal);border-radius:10px;padding:26px 28px;margin:18px 0 24px}
+        .mission-block p.big{font-family:var(--display);font-weight:600;font-size:1.2rem;line-height:1.45;color:var(--ink)}
+        .mission-block p.big em{font-style:normal;color:var(--signal)}
+
+        .card-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);margin:14px 0 8px}
+        .card-list .row{padding:18px 22px;border-bottom:1px solid var(--line)}
+        .card-list .row:last-child{border-bottom:none}
+        .card-list .row:nth-child(even){background:var(--porcelain)}
+        .card-list .row .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);display:block;margin-bottom:6px}
+        .card-list .row p{margin-bottom:0;font-size:.92rem}
+
+        .dtable{width:100%;border-collapse:collapse;font-size:.86rem;margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+        .dtable th{background:var(--delft-night);color:var(--glaze);text-align:left;padding:10px 14px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+        .dtable td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top;color:#28304a}
+        .dtable tr:nth-child(even) td{background:var(--porcelain)}
+        .dtable td:first-child{font-family:var(--mono);color:var(--delft);white-space:nowrap}
+        .table-scroll{overflow-x:auto}
+
+        .code{background:var(--delft-night);color:var(--glaze);border-radius:14px;padding:24px 26px;font-family:var(--mono);font-size:.82rem;line-height:1.7;overflow-x:auto;box-shadow:0 18px 44px rgba(6,12,32,.25);margin:14px 0 20px}
+        .code .cm{color:#7E93C4}
+        .code .kw{color:#F2A07B}
+        .code .st{color:#BFD3F2}
+        .code .fn{color:#9FD8B8}
+
+        .oq-group{margin-bottom:22px}
+        .oq-group h4{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);margin-bottom:10px}
+        .oq-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:.92rem;color:#28304a;max-width:68ch}
+        .oq-item .box{flex-shrink:0;width:16px;height:16px;border:1.5px solid var(--glaze-dim);border-radius:4px;margin-top:3px}
+
+        footer{background:var(--delft-night);color:var(--glaze-dim);border-top:1px solid var(--line-light)}
+        .foot-inner{display:flex;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:28px;gap:20px;flex-wrap:wrap;font-size:.86rem}
+        .foot-inner a{color:var(--glaze)}
+
+        @media (max-width:900px){
+            .doc-layout{grid-template-columns:1fr;gap:0}
+            .toc{position:static;border-left:none;padding-left:0;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:36px;max-height:none}
+            .toc a{margin-left:0}
+            .nav-toggle{display:flex}
+            .nav-links{position:absolute;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
+                background:var(--delft-night);border-bottom:1px solid var(--line-light);
+                padding:8px 0 16px;max-height:0;overflow:hidden;visibility:hidden}
+            .nav-links.open{max-height:80vh;overflow-y:auto;visibility:visible}
+            .nav-links a{padding:14px 24px;width:100%;box-sizing:border-box}
+            .nav-links a.btn{margin:12px 24px 4px;width:auto;text-align:center}
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+    <div class="wrap nav-inner">
+        <a href="index.html" class="wordmark" aria-label="Kopling home">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</a>
+        <div class="nav-links" id="nav-menu">
+            <a href="index.html#whatis">What it is</a>
+            <a href="index.html#stack">The stack</a>
+            <a href="charter.html">Charter</a>
+            <a href="extend.html" style="color:#fff">Extend</a>
+            <a href="index.html#support" class="btn btn-signal">Sponsor</a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+    </div>
+</nav>
+
+<header class="dhero">
+    <div class="wrap dhero-inner">
+        <span class="eyebrow" style="color:var(--glaze-dim)">Living document</span>
+        <h1>Extending Kopling</h1>
+        <p class="lede">Everything you need to build a Kopling extension: how it gets discovered, what one file is required, and every path convention that wires itself up for free. Revised openly as the extension system grows — check the date below.</p>
+        <div class="live-badge"><span class="dot"></span>Revised 2026-07 · the reference implementation is kept in sync, not just this page</div>
+        <div class="doc-meta">
+            <span>Reference implementation: <strong>k-extensions/example</strong> (kopling/development monorepo)</span>
+            <span>Full technical rationale: <strong>.docs/planning/decisions.md</strong></span>
+        </div>
+    </div>
+</header>
+
+<div class="wrap doc-layout">
+    <nav class="toc" aria-label="Table of contents">
+        <span class="toc-label">Extending Kopling</span>
+        <a href="#what">1. What an extension is</a>
+        <a href="#discovery">2. Getting discovered</a>
+        <a href="#extension-class">3. The Extension class</a>
+        <a href="#conventions">4. Directory conventions</a>
+        <a href="#contracts">5. Contracts</a>
+        <a href="#icon">6. Icon</a>
+        <a href="#reference">7. The reference implementation</a>
+        <a href="#open">8. Still evolving</a>
+    </nav>
+
+    <div class="doc-body">
+
+        <section id="what">
+            <span class="sec-num">Section 1</span>
+            <h2>What an extension is</h2>
+            <div class="mission-block">
+                <p class="big"><strong>An extension is PHP and templates.</strong> <em>Full stop.</em></p>
+            </div>
+            <p>No build step, no JavaScript framework to learn, no upgrade roulette. If you've ever built a small Laravel package, you already know almost everything you need — Kopling's extension system leans on ordinary Composer and Laravel conventions wherever it can, and only introduces something new where the alternative would be worse.</p>
+            <p>Concretely: an extension is a normal Composer package. It gets discovered, its directories get auto-wired into Laravel, and it can declare a small number of specific capabilities — that's the whole shape of the system this page documents.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="discovery">
+            <span class="sec-num">Section 2</span>
+            <h2>Getting discovered</h2>
+            <p>Two things in your extension's <code>composer.json</code> are what make it a Kopling extension at all:</p>
+            <div class="card-list">
+                <div class="row"><span class="k">type</span><p><code>"type": "kopling-extension"</code> — this is how Kopling finds your package among everything else installed via Composer. Nothing else looks for a Kopling extension any other way.</p></div>
+                <div class="row"><span class="k">autoload.psr-4</span><p>A normal PSR-4 mapping, e.g. <code>"YourVendor\\YourExtension\\": "src/"</code> — the same block every Composer package already needs for its classes to load.</p></div>
+            </div>
+            <p>That's the entire registration step. There's no separate file to list your extension in, no id to remember and repeat elsewhere — your entry-point class is derived automatically from that same PSR-4 namespace (see the next section), and every directory convention is found by presence, not by declaration.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="extension-class">
+            <span class="sec-num">Section 3</span>
+            <h2>The Extension class</h2>
+            <p>One file is required: <code>src/Extension.php</code>, always named <code>Extension</code>, always in the namespace your <code>autoload.psr-4</code> block declares.</p>
+            <pre class="code"><span class="cm">// src/Extension.php</span>
+
+<span class="kw">namespace</span> YourVendor\YourExtension;
+
+<span class="kw">use</span> Kopling\Core\Extension\AbstractExtension;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension
+{
+    <span class="kw">public static function</span> <span class="fn">name</span>(): <span class="st">string</span>
+    {
+        <span class="kw">return</span> <span class="st">'Your Extension'</span>;
+    }
+
+    <span class="kw">public static function</span> <span class="fn">description</span>(): <span class="st">string</span>
+    {
+        <span class="kw">return</span> <span class="st">'One sentence describing what it does.'</span>;
+    }
+}</pre>
+            <p>Two things worth understanding about the shape of this class, not just its syntax:</p>
+            <h4 class="sub">It's not a Laravel ServiceProvider</h4>
+            <p><code>AbstractExtension</code> has no relationship to <code>Illuminate\Support\ServiceProvider</code> at all. Laravel is the mainstream tool Kopling is built on, but extensions code against Kopling's own contract, never against Laravel directly — that way, a Laravel major version upgrade is a Kopling concern to absorb, never something every installed extension has to deal with itself. The actual Laravel wiring (registering views, routes, migrations, translations) happens inside Kopling core, in code you never write.</p>
+            <h4 class="sub">Why the base class isn't named <code>Extension</code> too</h4>
+            <p>Every extension names its own class <code>Extension</code> — deliberately, so you never have to invent or remember a class name. That only works because the class it extends is named <code>AbstractExtension</code>, not <code>Extension</code>: if the base class shared that name, your own file would need an import alias to tell the two apart. One small naming choice removes an entire category of boilerplate you'd otherwise hit on every extension you ever write.</p>
+            <p class="dim">Kopling's own classes are never marked <code>final</code>. You can always extend or override, on purpose — that stays true everywhere in Kopling, not just here.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="conventions">
+            <span class="sec-num">Section 4</span>
+            <h2>Directory conventions</h2>
+            <p>Everything below works by a directory simply existing in your extension, next to <code>src/</code>. Nothing to declare, no interface to implement, no method to call — put files where they belong and Kopling registers them for you.</p>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>Path</th><th>What it does</th><th>Notes</th></tr></thead>
+                    <tbody>
+                    <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace equal to your package name minus its vendor prefix — <code>yourvendor/example</code> becomes <code>example::</code>, so a template renders as <code>view('example::hello')</code>.</td></tr>
+                    <tr><td>lang/</td><td>Translations</td><td>Same auto-registered namespace as views — <code>__('example::messages.hello')</code>.</td></tr>
+                    <tr><td>migrations/</td><td>Database migrations</td><td>Auto-registered, no <code>database/</code> wrapper directory needed — just <code>migrations/</code> directly.</td></tr>
+                    <tr><td>routes/web.php</td><td>Routes</td><td>Auto-required — but <strong>not</strong> auto-wrapped in the <code>web</code> middleware group. Your file needs its own <code>Route::middleware('web')->group(...)</code>, the same way Kopling core's own routes file does.</td></tr>
+                    <tr><td>css/</td><td>Plain, hand-written CSS</td><td>No Tailwind, no build step. For anything beyond a safelisted layout-utility subset (flex/grid/gap/spacing), reach for a <code>&lt;x-k::*&gt;</code> component instead of a custom style.</td></tr>
+                    <tr><td>js/</td><td>Plain ES modules</td><td>No bundler required — a plain <code>&lt;script type="module"&gt;</code> file is enough for the rare case that genuinely needs one.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="dim">Both <code>css/</code> and <code>js/</code> are detected today; linking them onto the actual page is still an open item — see Section 8.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="contracts">
+            <span class="sec-num">Section 5</span>
+            <h2>Contracts</h2>
+            <p>Directory conventions cover everything Kopling can infer from your extension's filesystem. A small number of capabilities can't be expressed that way — declaring that your extension provides a storage driver, for instance, isn't something a folder existing can tell us. For those, implement one of Kopling's contract interfaces on your <code>Extension</code> class:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\RequestsStorageDriver;
+<span class="kw">use</span> Kopling\Core\Storage\StorageRequest;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> RequestsStorageDriver
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;StorageRequest&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">storage</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [<span class="kw">new</span> StorageRequest()];
+    }
+}</pre>
+            <p>You only implement the contracts relevant to your extension — Kopling checks for each one independently, so adding a new contract in a future release never affects extensions that don't use it.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="icon">
+            <span class="sec-num">Section 6</span>
+            <h2>Icon</h2>
+            <p>An <code>icon/</code> directory with a square PNG represents your extension anywhere Kopling lists installed extensions.</p>
+            <div class="card-list">
+                <div class="row"><span class="k">icon/lg.png</span><p>Required if you want an icon at all — this is the default, shown at 2048×2048.</p></div>
+                <div class="row"><span class="k">icon/sm.png</span><p>Optional. Extensions can ship additional named sizes for smaller display contexts; only <code>lg.png</code> is required.</p></div>
+            </div>
+        </section>
+        <hr class="divider">
+
+        <section id="reference">
+            <span class="sec-num">Section 7</span>
+            <h2>The reference implementation</h2>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, a contract implementation, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p class="dim">If this page and that directory ever disagree, the code is right and this page is stale — please tell us.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="open">
+            <span class="sec-num">Section 8</span>
+            <h2>Still evolving</h2>
+            <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
+            <div class="oq-group">
+                <div class="oq-item"><span class="box"></span>How <code>css/</code> and <code>js/</code> actually reach the page — a core-owned outlet is planned, not yet built.</div>
+                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, as real needs (outlets, listeners, settings) prove themselves out.</div>
+                <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated.</div>
+                <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="wrap foot-inner">
+        <span class="wordmark" style="font-size:1.05rem">k<svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#E8590C" stroke-width="2.6"/></svg>pling</span>
+        <span>Made in the Netherlands, built for everywhere.</span>
+        <span><a href="index.html">Home</a> · <a href="charter.html">Charter</a></span>
+    </div>
+</footer>
+
+<script>
+    (function(){
+        var toggle = document.getElementById('nav-toggle');
+        var menu = document.getElementById('nav-menu');
+        if(!toggle || !menu) return;
+        toggle.addEventListener('click', function(){
+            var isOpen = menu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        menu.querySelectorAll('a').forEach(function(a){
+            a.addEventListener('click', function(){
+                menu.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    })();
+</script>
+<script>
+    (function(){
+        var sections = Array.from(document.querySelectorAll('.doc-body section[id]'));
+        var links = Array.from(document.querySelectorAll('.toc a'));
+        if (!('IntersectionObserver' in window) || !sections.length) return;
+        var byId = {};
+        links.forEach(function(l){ byId[l.getAttribute('href').slice(1)] = l; });
+        var observer = new IntersectionObserver(function(entries){
+            entries.forEach(function(entry){
+                var link = byId[entry.target.id];
+                if (!link) return;
+                if (entry.isIntersecting) {
+                    links.forEach(function(l){ l.classList.remove('active'); });
+                    link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(function(s){ observer.observe(s); });
+    })();
+</script>
+</body>
+</html>
