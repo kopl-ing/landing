@@ -126,6 +126,12 @@
         .role-kind p{font-size:.9rem;margin-bottom:6px}
         .role-kind .scope{font-size:.84rem;color:#5A6272}
         .role-kind .scope b{color:var(--ink);font-weight:600}
+        .role-kind .resp{font-size:.84rem;color:#5A6272;margin:6px 0 0 1.2em}
+        .role-kind .resp li{margin-bottom:4px}
+
+        .division{margin-bottom:26px}
+        .division-head h4{font-family:var(--display);font-weight:600;font-size:1.05rem;color:var(--delft);margin-bottom:2px}
+        .division-head p{font-size:.9rem;color:#5A6272;margin-bottom:12px}
 
         .dtable{width:100%;border-collapse:collapse;font-size:.86rem;margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
         .dtable th{background:var(--delft-night);color:var(--glaze);text-align:left;padding:10px 14px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
@@ -307,6 +313,7 @@
             <p>This section describes the <em>kinds</em> of role in the project — not a list of exactly who holds what today. Who actually holds each role changes constantly, so that list lives in a separate, freely-updatable document, not in a charter that would need editing every time someone joins or steps back.</p>
 
             <h3>Kinds of role</h3>
+            <p class="dim">This is the authority ladder — how much say a role carries. It's a separate question from <em>what field of work</em> a role is in, which is what Divisions, below, describe. A "team lead" only means something once you know which team.</p>
             <div class="role-kind">
                 <h4>Founder <span class="vacant-tag" style="background:none;border:none;color:var(--delft);padding:0">— filled</span></h4>
                 <p>Has the final say per Section 3, and is accountable for the succession plan and the project's overall direction.</p>
@@ -319,8 +326,8 @@
             </div>
             <div class="role-kind">
                 <h4>Team lead <span class="vacant-tag">empty — no teams yet</span></h4>
-                <p>Coordinates one specific area of ongoing work, once that area has more than one contributor — for example, coordinating translations, reviewing extensions, or moderating the community.</p>
-                <p class="scope"><b>Covers:</b> their named area. <b>Doesn't cover:</b> other teams' areas — a team lead doesn't quietly end up responsible for undefined work (Section 7).</p>
+                <p>Coordinates one specific team, once that team has more than one contributor — for example, <strong>Lead core dev</strong> is this role held by the Core dev team's lead.</p>
+                <p class="scope"><b>Covers:</b> their named team. <b>Doesn't cover:</b> other teams' work — a team lead doesn't quietly end up responsible for undefined work (Section 7).</p>
             </div>
             <div class="role-kind">
                 <h4>Team member <span class="vacant-tag">empty</span></h4>
@@ -333,6 +340,85 @@
                 <p class="scope"><b>Covers:</b> whatever they choose to take on. <b>Doesn't cover:</b> nothing is off-limits here on purpose — it's meant to be the easiest kind of role to step into and out of.</p>
             </div>
 
+            <h3>Divisions</h3>
+            <p>A division is a field of work, not a level of authority — it's the answer to "what is this role even about." Every standing team (below) sits inside exactly one division. Each team lists its <strong>responsibilities</strong>: concrete, checkable duties, not a claim about territory — overlap between teams is normal and expected, so drawing hard boundaries would just be dishonest about how the work actually happens. What matters is whether a responsibility got done, since that's the only fair thing to check against (Section 7 covers what happens when it doesn't).</p>
+
+            <div class="division">
+                <div class="division-head"><h4>Community</h4><p>Keeps the people who use Kopling safe, heard, and helped.</p></div>
+                <div class="role-kind">
+                    <h4>Moderation team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Responds to reports within the community's stated window</li>
+                        <li>Applies the harm-not-humanity standard (Section 2, item 5) — acts on harm, not on someone having a bad day</li>
+                        <li>Keeps a public log of actions taken, per the transparency promise (Section 8)</li>
+                    </ul>
+                </div>
+                <div class="role-kind">
+                    <h4>Support &amp; Q&amp;A team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Answers "how do I" questions from people running or using Kopling</li>
+                        <li>Triages incoming reports into confirmed bugs and hands those to the Core dev team</li>
+                        <li>Keeps response times honest and visible, not silently backlogged</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="division">
+                <div class="division-head"><h4>Development</h4><p>Builds and maintains the software itself.</p></div>
+                <div class="role-kind">
+                    <h4>Core dev team <span class="vacant-tag">empty — led by Lead core dev</span></h4>
+                    <ul class="resp">
+                        <li>Reviews and merges code for <code>kopling/core</code> and the skeleton</li>
+                        <li>Owns release-readiness against the release cadence (Section 7)</li>
+                        <li>Keeps the <code>Kopling\Extend\*</code> contracts stable across releases</li>
+                    </ul>
+                </div>
+                <div class="role-kind">
+                    <h4>Extension review team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Reviews registry submissions against the compatibility and signing gate (Section 9, Registry)</li>
+                        <li>Flags declared-override conflicts before they reach a live install</li>
+                        <li>Keeps registry review turnaround public</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="division">
+                <div class="division-head"><h4>Content</h4><p>Makes Kopling understandable, in people's own language.</p></div>
+                <div class="role-kind">
+                    <h4>Documentation team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Writes and maintains docs for people running, using, and extending Kopling</li>
+                        <li>Keeps docs in step with each release, not trailing behind it</li>
+                    </ul>
+                </div>
+                <div class="role-kind">
+                    <h4>Translation team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Coordinates translators per locale through the core-owned Weblate/Tolgee pipeline (Section 9, Translations)</li>
+                        <li>Keeps language packs current with each release</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="division">
+                <div class="division-head"><h4>Growth</h4><p>Tells people Kopling exists, and keeps it funded.</p></div>
+                <div class="role-kind">
+                    <h4>Promotion &amp; marketing team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Maintains the public site, social presence, and release announcements</li>
+                        <li>Keeps messaging aligned with the brand voice (Section 10)</li>
+                    </ul>
+                </div>
+                <div class="role-kind">
+                    <h4>Sponsorship &amp; partnerships team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Handles sponsor and donor relations</li>
+                        <li>Keeps sponsor involvement within the "money never buys influence" line (Section 3) — visibility and thanks, never control</li>
+                    </ul>
+                </div>
+            </div>
+
             <h3>Empty roles are named, not hidden</h3>
             <p>A role with nobody in it is an empty seat, not a problem to hide. Right now, every role except founder is empty, and we say so plainly here instead of pretending otherwise. Naming an empty role is what eventually lets the right person step into it — nobody can be recruited for a role they don't know exists.</p>
 
@@ -340,7 +426,7 @@
             <p>Once there's more than one contributor, the specific people holding roles below team lead — and which roles are still empty — will be listed in a separate, living document called <strong>Teams and Roles</strong>, published on kopl.ing or wherever Kopling's community lives. That list can change any day without ever needing to change this charter.</p>
 
             <h3>Standing teams versus working groups</h3>
-            <p>A <strong>standing team</strong> does ongoing work — like moderation or translation — and continues for as long as that work is needed. A <strong>working group</strong> exists for one specific task with a clear end point (for example, writing the first version of the extension API), and it closes once that task is done. Neither exists yet — we describe the difference now so the shape is settled before the first one forms.</p>
+            <p>A <strong>standing team</strong> does ongoing work — like moderation or translation — and continues for as long as that work is needed; it lives inside one of the four divisions above. A <strong>working group</strong> exists for one specific task with a clear end point (for example, writing the first version of the extension API), closes once that task is done, and doesn't need a permanent division of its own — it can form inside one division or draw people from several. None exist yet — we describe the difference now so the shape is settled before the first one forms.</p>
 
             <h3>Role concentration</h3>
             <p>If one person holds several important roles at once, that's tracked as a risk (Section 7), not praised as efficiency. Right now, the founder holds every role, simply because there's no one else yet. That's stated plainly as something to reduce over time, not as how things are meant to stay.</p>
@@ -379,6 +465,9 @@
 
             <h3>Release cadence</h3>
             <p>Kopling aims to release on a steady, public schedule — maybe every two months, though the exact number isn't fixed yet (see Open Questions). A steady schedule does two useful things. First, it gives an honest, no-blame way to notice when someone has quietly become less active, and move them to reduced-activity or emeritus — as a simple, scheduled check, not as anyone passing judgment. Second, it keeps releases honest: each one ships whatever is actually ready, and anything unfinished waits for the next cycle instead of being rushed. Delays happen no matter how good the plan is, and good code takes the time it takes — the schedule exists to make that normal, not something to feel guilty about.</p>
+
+            <h3>Role removal isn't the same as stepping back</h3>
+            <p>Reduced-activity and emeritus, above, describe a person's overall standing — always available, no explanation required, never a judgment. A role is a narrower thing: one specific seat, held because a division's team (Section 5) needs it filled, with responsibilities that are concrete and checkable on purpose — not to draw territory, but because a responsibility either got done or it didn't, and that's the only fair thing to check. At the same release-cadence checkpoint used to review activity states, an unmet responsibility gets the same no-blame first move: reduced-activity for that role, no explanation required. If the seat is still unfilled through a full cycle with nobody responding, it's simply named vacant again — the "empty roles are named, not hidden" rule (Section 5) applies here too. Losing a role this way never touches someone's standing on the recognition ladder (Section 6) — that's for what they already contributed, not what they're doing right now. This is deliberately separate from removal for harm (Section 2, item 5), which is about conduct, not output, and follows moderation's own process, not this one.</p>
 
             <h3>Bus-factor register</h3>
             <p>A "bus factor" is a simple way of asking: if one person disappeared tomorrow, how much would the project lose? Kopling keeps an honest, current list of every place where that number is one — a single person holding critical knowledge alone — each with a plan to fix it, whether that means teaching someone else, writing things down, or, when there's genuinely no other option, accepting the risk on the record. <strong>Right now, the list has exactly one entry: the whole project.</strong> The plan to fix it is the succession plan (Section 4) and the future Technical Steering Committee (Section 3), whose job partly exists to end this on a real timeline, not by accident. Once Kopling has a public home to publish it (Section 8), this register becomes public too.</p>
@@ -425,6 +514,7 @@
 
             <div class="card-list">
                 <div class="row"><span class="k">Backend</span><p>Full <code>laravel/framework</code> — never cherry-picked illuminate components. Kopling ships its own skeleton. Two-tier extension API: <code>Kopling\Extend\*</code> contracts + blessed Laravel primitives (Eloquent, collections, validation, events); framework internals stay core-only. Laravel majors adopted on Kopling's schedule.</p></div>
+                <div class="row"><span class="k">Content model</span><p>The thing people share and gather around is called a <strong>Moment</strong> — not a "Discussion" or "Topic," and there's no separate "Original Post"/"First Post" concept sitting inside it: a Moment already is the whole thing, the sharing and everything discussed, reacted to, praised, or loathed around it. An individual contribution inside a Moment stays a plain <strong>reply</strong> — no renaming needed there.</p></div>
                 <div class="row"><span class="k">Frontend</span><p>htmx 4 + Blade + Alpine. Server is the single source of truth; no build step for extensions. Raw <code>hx-*</code> is not the official API — Kopling Blade components (<code>&lt;x-k::action&gt;</code>) emit it. Core-owned JS islands are custom elements so they survive swaps and morphs.</p></div>
                 <div class="row"><span class="k">Extension surface</span><p>"An extension is PHP and templates. Full stop." Named, prioritized outlets across small granular partials; extensions ship routes returning HTML fragments; out-of-band swaps update core regions through the response, never by patching. Outlets compose; overrides don't — overrides require manifest-declared conflict detection.</p></div>
                 <div class="row"><span class="k">Editor</span><p>Tiptap; ProseMirror JSON is canonical; server-rendered via tiptap-php through a whitelist — the same whitelist doubles as the XSS and federation-sanitization model. Extension nodes ship as a PHP renderer + optional plain ESM file, no bundler required. v1 ships core nodes only; the extension node API waits until proven by 2–3 first-party extensions.</p></div>
@@ -469,6 +559,7 @@
                 <div class="oq-item"><span class="box"></span>The precise countable criteria for the contribution ladder (Section 6): thresholds, grant/lapse rules, and resistance to gaming.</div>
                 <div class="oq-item"><span class="box"></span>Role-concentration cap: how many critical roles one person may hold at once, once Section 5's roles start being populated.</div>
                 <div class="oq-item"><span class="box"></span>Format and hosting location of the living Teams and Roles document (Section 5).</div>
+                <div class="oq-item"><span class="box"></span>Appeal process for role removal (Section 7) — the general appeal principle exists (Section 6) but isn't yet mapped to this specific mechanic.</div>
                 <div class="oq-item open"><span class="box"></span>Whether the AI doctrine (Section 2, item 6) joins the public governance commitments as a named seventh, or stays doctrine-only.</div>
             </div>
 
@@ -482,6 +573,7 @@
                 <div class="oq-item"><span class="box"></span>Registry namespace policy and signing implementation; Weblate vs. Tolgee selection.</div>
                 <div class="oq-item"><span class="box"></span>Media pipeline specifics; notification system design.</div>
                 <div class="oq-item open"><span class="box"></span>Reaction and acknowledgment mechanics — the principle is settled (Section 2, item 3), the exact mechanism (visible counts vs. author-only warmth) is not.</div>
+                <div class="oq-item"><span class="box"></span>How admins modify layout and theme interactively from the admin area — the harder, still-open follow-on to the runtime CSS-variable re-theming already settled (Section 9, Styling). Includes per-element customization, not just color: e.g. a support or staffing community (Section 2, item 4) changing what the default "Share A Moment" call-to-action says, looks like, or does — up to replacing it with a custom flow like a "Submit an issue" form instead of the default composer.</div>
                 <div class="oq-item"><span class="box"></span>Anti-abuse v1 scope.</div>
             </div>
 
@@ -529,6 +621,9 @@
                     <tr><td>D23</td><td>Voting standing deferred until a TSC exists, but built on the same contribution ladder as recognition</td><td>Inventing a separate electorate definition later</td><td>Designing one ladder now avoids redesigning it under pressure once elections become real</td></tr>
                     <tr><td>D24</td><td>Steady, named release cadence adopted as a principle (candidate: every two months)</td><td>Release-whenever-ready with no rhythm</td><td>Gives an honest, low-drama signal for activity states; forces ship-what's-finished scope discipline</td></tr>
                     <tr><td>D25</td><td>Plain language for a global, largely non-native-English audience, applied to the charter itself</td><td>Governance-register or jargon-heavy drafting</td><td>Inclusion, not simplification for its own sake — avoids recreating elitism through inaccessible language</td></tr>
+                    <tr><td>D26</td><td>"Moment" as the core content-model noun; "reply" stays a plain, unrenamed word</td><td>"Discussion"/"Topic" + a separate "Original Post"/"First Post"</td><td>Continues language the charter already uses for the Immediate principle instead of inventing separate jargon; removing the OP/first-post split entirely — a Moment already is the whole thing — costs nothing since it was never load-bearing</td></tr>
+                    <tr><td>D27</td><td>Section 5 splits "kinds of role" (authority: founder, TSC, team lead, team member, contributor at large) from "divisions" (field of work: Community, Development, Content, Growth), each with named standing teams</td><td>One flat role list mixing authority and field of work; a large WordPress-style team roster (~20+ Make teams)</td><td>Authority and field of work are different questions — "team lead" is meaningless without knowing which team; four divisions matches the scale of Rust's ~8 top-level teams, appropriate for a pre-1.0 project with one contributor today</td></tr>
+                    <tr><td>D28</td><td>Teams are defined by checkable responsibilities, not covers/doesn't-cover boundaries; a role-removal mechanic (the seat goes vacant, not the person) sits in Section 7 alongside reduced-activity/emeritus</td><td>Covers/doesn't-cover boundary language; no mechanism for an unmet responsibility beyond the general activity-state check</td><td>Boundaries imply no overlap, which isn't true in practice — a checkable duty is what's fair to measure; underperformance and burnout need different no-blame responses, and losing a seat shouldn't cost someone standing already earned (Section 6)</td></tr>
                     </tbody>
                 </table>
             </div>
