@@ -246,8 +246,8 @@
                 <table class="dtable">
                     <thead><tr><th>Path</th><th>What it does</th><th>Notes</th></tr></thead>
                     <tbody>
-                    <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace equal to your package name minus its vendor prefix — <code>yourvendor/example</code> becomes <code>example::</code>, so a template renders as <code>view('example::hello')</code>.</td></tr>
-                    <tr><td>lang/</td><td>Translations</td><td>Same auto-registered namespace as views — <code>__('example::messages.hello')</code>.</td></tr>
+                    <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace built from your full package name, vendor included, hyphenated — <code>yourvendor/example</code> becomes <code>yourvendor-example::</code>, so a template renders as <code>view('yourvendor-example::hello')</code>. The vendor stays in the namespace on purpose: two different vendors can each publish an extension called <code>example</code>, and dropping the vendor would make their view/translation namespaces collide.</td></tr>
+                    <tr><td>lang/</td><td>Translations</td><td>Same auto-registered namespace as views — <code>__('yourvendor-example::messages.hello')</code>.</td></tr>
                     <tr><td>migrations/</td><td>Database migrations</td><td>Auto-registered, no <code>database/</code> wrapper directory needed — just <code>migrations/</code> directly.</td></tr>
                     <tr><td>routes/web.php</td><td>Routes</td><td>Auto-required — but <strong>not</strong> auto-wrapped in the <code>web</code> middleware group. Your file needs its own <code>Route::middleware('web')->group(...)</code>, the same way Kopling core's own routes file does.</td></tr>
                     <tr><td>css/</td><td>Plain, hand-written CSS</td><td>No Tailwind, no build step. For anything beyond a safelisted layout-utility subset (flex/grid/gap/spacing), reach for a <code>&lt;x-k::*&gt;</code> component instead of a custom style.</td></tr>
