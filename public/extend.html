@@ -177,9 +177,10 @@
         <a href="#extension-class">3. The Extension class</a>
         <a href="#conventions">4. Directory conventions</a>
         <a href="#contracts">5. Contracts</a>
-        <a href="#icon">6. Icon</a>
-        <a href="#reference">7. The reference implementation</a>
-        <a href="#open">8. Still evolving</a>
+        <a href="#permissions">6. Permissions</a>
+        <a href="#icon">7. Icon</a>
+        <a href="#reference">8. The reference implementation</a>
+        <a href="#open">9. Still evolving</a>
     </nav>
 
     <div class="doc-body">
@@ -280,8 +281,40 @@
         </section>
         <hr class="divider">
 
-        <section id="icon">
+        <section id="permissions">
             <span class="sec-num">Section 6</span>
+            <h2>Permissions</h2>
+            <p>If your extension needs to gate an action behind something an admin can grant or take away, declare a permission — don't hardcode a check against "is this person an admin." Kopling has no such flag: every permission is its own named, granular capability, and "Admin"/"Moderator" are just conventional bundles of them an admin assigns, never anything the code treats specially.</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Authorization\Permission;
+<span class="kw">use</span> Kopling\Core\Extension\Contract\HasPermissions;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> HasPermissions
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;Permission&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">permissions</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [
+            <span class="kw">new</span> Permission(
+                id: <span class="st">'manage-things'</span>,
+                label: <span class="fn">__</span>(<span class="st">'yourvendor-example::permissions.manage-things.label'</span>),
+                description: <span class="fn">__</span>(<span class="st">'yourvendor-example::permissions.manage-things.description'</span>),
+            ),
+        ];
+    }
+}</pre>
+            <p>Write only the local part of the id — <code>manage-things</code>, not <code>yourvendor-example::manage-things</code>. Kopling prefixes it with your extension's own id before it's ever registered, joined with <code>::</code> — the same separator, and the same reason, as your view and translation namespaces (Section 4) — so you never have to worry about another extension picking the same name.</p>
+            <p><code>label</code>/<code>description</code> go through your extension's own <code>lang/</code> (Section 4) with Laravel's <code>__()</code> helper, the same as any other user-facing string — never a hardcoded string in whatever language you happened to write the extension in. By the time <code>permissions()</code> is called, your <code>lang/</code> is already registered, so the translation resolves correctly.</p>
+            <h4 class="sub">Recommended naming</h4>
+            <p>Verb-noun, lowercase, hyphenated — <code>manage-things</code>, <code>view-reports</code>, <code>delete-things</code> — matching the shape of core's own permissions (<code>core::manage-people</code>), so an admin's permission list reads consistently across every installed extension instead of as a patchwork of each author's own style.</p>
+            <h4 class="sub">The callback is an escape hatch, not the default</h4>
+            <p>Most permissions need nothing beyond a name — Kopling checks whether the signed-in person's groups have been granted it, and that's the whole decision. For the rare case that needs more (e.g. "can edit <em>this specific</em> reply," not any reply), <code>Permission</code> takes an optional callback that runs <em>in addition to</em> the grant check, never instead of it — it can only narrow access down further, never grant it on its own.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="icon">
+            <span class="sec-num">Section 7</span>
             <h2>Icon</h2>
             <p>An <code>icon/</code> directory with a square PNG represents your extension anywhere Kopling lists installed extensions.</p>
             <div class="card-list">
@@ -292,22 +325,23 @@
         <hr class="divider">
 
         <section id="reference">
-            <span class="sec-num">Section 7</span>
+            <span class="sec-num">Section 8</span>
             <h2>The reference implementation</h2>
-            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, a contract implementation, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, both contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
             <p class="dim">If this page and that directory ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
         <hr class="divider">
 
         <section id="open">
-            <span class="sec-num">Section 8</span>
+            <span class="sec-num">Section 9</span>
             <h2>Still evolving</h2>
             <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
             <div class="oq-group">
                 <div class="oq-item"><span class="box"></span>How <code>css/</code> and <code>js/</code> actually reach the page — a core-owned outlet is planned, not yet built.</div>
-                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, as real needs (outlets, listeners, settings) prove themselves out.</div>
+                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code> and <code>HasPermissions</code>, as real needs (outlets, listeners, settings) prove themselves out.</div>
                 <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated.</div>
                 <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
+                <div class="oq-item"><span class="box"></span>No admin UI yet for assigning permissions to groups — only a PHP API (<code>Group::givePermissionTo()</code>/<code>revokePermissionTo()</code>).</div>
             </div>
         </section>
 
