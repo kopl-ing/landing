@@ -313,31 +313,46 @@
             <p>This section describes the <em>kinds</em> of role in the project — not a list of exactly who holds what today. Who actually holds each role changes constantly, so that list lives in a separate, freely-updatable document, not in a charter that would need editing every time someone joins or steps back.</p>
 
             <h3>Kinds of role</h3>
-            <p class="dim">This is the authority ladder — how much say a role carries. It's a separate question from <em>what field of work</em> a role is in, which is what Divisions, below, describe. A "team lead" only means something once you know which team.</p>
+            <p class="dim">This is the authority ladder — how much say a role carries. It's a separate question from <em>what field of work</em> a role is in, which is what Divisions, below, describe. Some of these roles are global — they don't belong to any one division. Others only exist inside a division's team, and mean nothing without one: a "team lead" only means something once you know which team.</p>
+
+            <h4 class="sub">Global roles</h4>
             <div class="role-kind">
                 <h4>Founder <span class="vacant-tag" style="background:none;border:none;color:var(--delft);padding:0">— filled</span></h4>
-                <p>Has the final say per Section 3, and is accountable for the succession plan and the project's overall direction.</p>
-                <p class="scope"><b>Covers:</b> everything not yet handed off. <b>Doesn't cover:</b> once a Technical Steering Committee forms, the extension API, breaking-change policy, and retiring old features move to its authority (Section 3) — the founder stops deciding those alone.</p>
+                <ul class="resp">
+                    <li>Holds final say per Section 3 on anything not yet handed to the Technical Steering Committee or a division</li>
+                    <li>Accountable for the succession plan and the project's overall direction</li>
+                    <li>Once a Technical Steering Committee forms, hands it the extension API, breaking-change policy, and retiring old features (Section 3) — stops deciding those alone</li>
+                </ul>
             </div>
             <div class="role-kind">
                 <h4>Technical Steering Committee member <span class="vacant-tag">empty — not yet formed</span></h4>
-                <p>Holds a named area of responsibility (for example: managing releases, keeping the extension API stable, watching over contributor wellbeing) tied to a clear, checkable goal, per Section 3.</p>
-                <p class="scope"><b>Covers:</b> their stated area of responsibility. <b>Doesn't cover:</b> anything outside it — one committee member doesn't get to decide things for the whole project alone.</p>
-            </div>
-            <div class="role-kind">
-                <h4>Team lead <span class="vacant-tag">empty — no teams yet</span></h4>
-                <p>Coordinates one specific team, once that team has more than one contributor — for example, <strong>Lead core dev</strong> is this role held by the Core dev team's lead.</p>
-                <p class="scope"><b>Covers:</b> their named team. <b>Doesn't cover:</b> other teams' work — a team lead doesn't quietly end up responsible for undefined work (Section 7).</p>
-            </div>
-            <div class="role-kind">
-                <h4>Team member <span class="vacant-tag">empty</span></h4>
-                <p>Takes part in one team's ongoing work, under that team's lead.</p>
-                <p class="scope"><b>Covers:</b> the team's defined work. <b>Doesn't cover:</b> permanently owning any single piece of that work alone — recurring work rotates between people (Section 7).</p>
+                <ul class="resp">
+                    <li>Holds a named area of responsibility (for example: managing releases, keeping the extension API stable, watching over contributor wellbeing) tied to a clear, checkable goal (Section 3)</li>
+                    <li>Decides only within that stated area — never for the whole project alone; project-wide calls stay with the full committee or the founder</li>
+                </ul>
             </div>
             <div class="role-kind">
                 <h4>Contributor at large <span class="vacant-tag" style="background:none;border:none;color:var(--delft);padding:0">— open to anyone</span></h4>
-                <p>Anyone contributing code, triage, support, docs, translation, moderation, or review without holding a named role. This is the entry point into the recognition ladder described in Section 6.</p>
-                <p class="scope"><b>Covers:</b> whatever they choose to take on. <b>Doesn't cover:</b> nothing is off-limits here on purpose — it's meant to be the easiest kind of role to step into and out of.</p>
+                <ul class="resp">
+                    <li>Takes on whatever they choose to contribute — code, triage, support, docs, translation, moderation, or review — without holding a named role</li>
+                    <li>Is the entry point into the recognition ladder described in Section 6; nothing here is off-limits on purpose, making it the easiest kind of role to step into and out of</li>
+                </ul>
+            </div>
+
+            <h4 class="sub">Division-specific roles</h4>
+            <div class="role-kind">
+                <h4>Team lead <span class="vacant-tag">empty — no teams yet</span></h4>
+                <ul class="resp">
+                    <li>Coordinates one specific team's work and contributors, once that team has more than one contributor — for example, <strong>Lead core dev</strong> is this role held by the Core dev team's lead</li>
+                    <li>Answers for that team only — never quietly ends up responsible for another team's work, or for undefined work outside any team (Section 7)</li>
+                </ul>
+            </div>
+            <div class="role-kind">
+                <h4>Team member <span class="vacant-tag">empty</span></h4>
+                <ul class="resp">
+                    <li>Takes part in one team's ongoing, defined work, under that team's lead</li>
+                    <li>Shares that work rather than permanently owning any one piece of it alone — recurring work rotates between people (Section 7)</li>
+                </ul>
             </div>
 
             <h3>Divisions</h3>
@@ -488,7 +503,7 @@
             <p>Some work never really finishes — responding to security issues, managing releases, sorting incoming reports, keeping dependencies up to date. This kind of work is where burnout usually starts, because there's no natural point where it's "done." Other work — building a new feature — is optional and has a clear finish line. Once more than one person shares the ongoing work, it will rotate through a <strong>duty roster</strong>: one named person covers it for a fixed period, the schedule is public so any gaps are visible, and nobody outside their turn has any obligation at all. Until then, the founder carries all of it alone — stated here plainly as something that can't stay that way forever, not as how things are meant to work.</p>
 
             <h3>Every role has clear edges</h3>
-            <p>Every role in Section 5 comes with a written description of what it covers — and just as important, what it doesn't. A role described as "everything nobody else is doing" can never actually be finished, and never lets the person doing it feel done. Work that falls outside every defined role is the Technical Steering Committee's job to assign somewhere, once one exists — it shouldn't just land on whoever feels most responsible for it.</p>
+            <p>Every role in Section 5 comes with a written list of concrete responsibilities — not a vague claim to "everything nobody else is doing," which can never actually be finished, and never lets the person doing it feel done. Work that falls outside every defined role's responsibilities is the Technical Steering Committee's job to assign somewhere, once one exists — it shouldn't just land on whoever feels most responsible for it.</p>
 
             <h3>Saying no, and moving slowly, are both fine</h3>
             <p>Turning down an idea, or simply moving slowly, is normal and legitimate. It reflects badly on nobody — not the person who suggested it, and not the person who said no. Moving slowly and sustainably is better than moving fast and burning out.</p>
@@ -640,6 +655,7 @@
                     <tr><td>D28</td><td>Teams are defined by checkable responsibilities, not covers/doesn't-cover boundaries; a role-removal mechanic (the seat goes vacant, not the person) sits in Section 7 alongside reduced-activity/emeritus</td><td>Covers/doesn't-cover boundary language; no mechanism for an unmet responsibility beyond the general activity-state check</td><td>Boundaries imply no overlap, which isn't true in practice — a checkable duty is what's fair to measure; underperformance and burnout need different no-blame responses, and losing a seat shouldn't cost someone standing already earned (Section 6)</td></tr>
                     <tr><td>D29</td><td>UI organized into named "Portals" (not "Frontends"), gated by granular per-action permissions instead of a hardcoded admin flag; a Portal is a registrable pattern, not fixed to exactly two</td><td>"Frontend" terminology; Flarum's binary admin-access model; hardcoding Community/Admin as the only two surfaces forever</td><td>A binary admin flag was a real, lived Flarum flaw — no way to grant partial admin access; that granularity matters most for support/staffing communities (Section 2, item 4); proving Portals are generatable via a real Moderation portal mirrors how a first-party extension proves the extension API before it freezes</td></tr>
                     <tr><td>D30</td><td>Added a fifth division, "Design &amp; UX", with one team (Design system team)</td><td>Folding design-system/theming work into Development or Growth</td><td>Design-system and theming work (<code>&lt;x-k::*&gt;</code>, daisyUI, brand tokens) is real, ongoing, and distinct from either building the backend or marketing the product — naming it gives it a real home instead of hiding it inside an unrelated division</td></tr>
+                    <tr><td>D31</td><td>Extended D28's "checkable responsibilities, not covers/doesn't-cover" language to the Kinds-of-role ladder, and split it into global roles (Founder, TSC member, Contributor at large) versus division-specific roles (Team lead, Team member)</td><td>Covers/doesn't-cover phrasing surviving only in the authority ladder; one flat list mixing global and division-scoped roles</td><td>D28 fixed the language for named teams but missed the ladder itself; grouping by scope makes explicit which roles need a division to mean anything (team lead, team member) and which don't (founder, TSC member, contributor at large)</td></tr>
                     </tbody>
                 </table>
             </div>
