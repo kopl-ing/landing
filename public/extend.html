@@ -286,7 +286,29 @@
                 <div class="row"><span class="k">HasPortals</span><p>Registers a new named UI surface — its own route and layout. Section 7.</p></div>
                 <div class="row"><span class="k">ChangesUx</span><p>Places UI, like a nav link, into an existing slot on any Portal. Section 8.</p></div>
                 <div class="row"><span class="k">CannotBeDisabled</span><p>A marker — no method at all. See below.</p></div>
+                <div class="row"><span class="k">ChangesTheme</span><p>Ships a named theme — CSS custom-property overrides on top of the compiled default. See below.</p></div>
             </div>
+
+            <h4 class="sub"><code>ChangesTheme</code>: a theme is just another capability, not a special case</h4>
+            <p>A "theme" isn't a separate installable concept from an extension — it's an ordinary extension that implements <code>ChangesTheme</code>, overriding whichever CSS custom properties it wants on top of the compiled default:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\ChangesTheme;
+<span class="kw">use</span> Kopling\Core\Ux\Theme\Token;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> ChangesTheme
+{
+    <span class="cm">// ...name(), description() as above -- this is what shows up as the theme's own name</span>
+
+    <span class="cm">/** @return array&lt;string, string&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">theme</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [
+            Token::ColorPrimary->value =&gt; <span class="st">'#5b7fd6'</span>,
+            Token::ColorBase100->value =&gt; <span class="st">'#0b1220'</span>,
+        ];
+    }
+}</pre>
+            <p><code>Token</code> is a fixed, finite enum — the exact set of CSS custom properties the compiled theme already defines (colors and radii), never arbitrary CSS. Override only the tokens you actually want to change; anything you leave out keeps the compiled default, so a theme can be a full palette swap or a single-color tweak. Values are checked against each token's expected shape (a hex color for a color token, a CSS length for a radius token) the moment your extension is discovered — a bad value is a bug in your extension, caught immediately, not something Kopling silently works around.</p>
+            <p class="dim">No selection mechanism between multiple installed themes exists yet — every installed <code>ChangesTheme</code> extension's tokens simply get merged together. Fine with one theme installed; genuinely picking one active theme is still open (Section 11).</p>
 
             <h4 class="sub"><code>CannotBeDisabled</code>: a marker, not a capability</h4>
             <p>Kopling doesn't yet have a way for an admin to disable an installed extension at all — that logic is still to come. This contract exists ahead of it anyway, so the guarantee is in place from day one rather than retrofitted once disabling exists: whatever eventually implements that toggle must refuse for any <code>Extension</code> implementing this marker.</p>
@@ -383,13 +405,17 @@
 
             <h4 class="sub">What registering a Portal actually does</h4>
             <p>Kopling registers exactly one route per Portal: a <code>GET</code> at <code>path</code>, named after the fully-prefixed <code>id</code>. Visiting it checks <code>permission</code> (if you set one) against the signed-in person, then renders <code>layout</code> with the Portal instance bound to it as <code>$portal</code> — the same mechanism Kopling's own Community and Admin portals run through, no special case for either.</p>
-            <p>Your <code>layout</code> is expected to be a thin wrapper, the same way Kopling's own are:</p>
+            <p>Your <code>layout</code> is expected to wrap <code>&lt;x-k::portal.layout&gt;</code> — the one truly shared piece, just html/head/body chrome, nothing else — and compose whichever named regions your Portal actually needs inside it:</p>
             <pre class="code"><span class="cm">&lt;!-- yourvendor-example/views/layouts/moderation.blade.php --&gt;</span>
 
-&lt;x-k::portal.layout portal=<span class="st">"yourvendor-example::moderation"</span>&gt;
+&lt;x-k::portal.layout&gt;
+    &lt;aside&gt;
+        &lt;x-k::portal.slot name=<span class="st">"yourvendor-example::moderation.sidebar"</span> /&gt;
+    &lt;/aside&gt;
+
     @yield(<span class="st">'content'</span>)
 &lt;/x-k::portal.layout&gt;</pre>
-            <p><code>&lt;x-k::portal.layout&gt;</code> is the one shared shell every Portal renders through — head, a side-navigation region, a header showing <code>label</code>, and a main content slot — so individual Portal layouts never duplicate that chrome. What actually shows up in the side navigation isn't decided by which Portal it is; every Portal renders the exact same <code>core::side-navigation</code> slot, filled by whatever <code>ChangesUx</code> entries pass their own permission check (Section 8) — that's true for the Admin portal today, and it's true for any Portal you register too.</p>
+            <p>This is deliberate: Kopling's own Community and Admin portals don't share one fixed shape either — Admin is a sidebar and a content area, Community is a top bar, sidebar, content, right rail, and a bottom composer region. <code>&lt;x-k::portal.slot name="..."&gt;</code> (Section 8) is the one primitive both use to resolve and render whatever's registered into a given slot name — it has no opinion about the markup around it, so your own layout is free to arrange its regions however actually fits it, with its own slot names.</p>
         </section>
         <hr class="divider">
 
@@ -411,11 +437,10 @@
             -&gt;add(Item::class, [<span class="st">'label'</span> =&gt; <span class="st">'Hello'</span>, <span class="st">'route'</span> =&gt; <span class="st">'example.hello'</span>])
             -&gt;in(<span class="st">'core::side-navigation'</span>)
             -&gt;as(<span class="st">'hello'</span>)
-            -&gt;after(<span class="st">'core::theme'</span>)
             -&gt;when(<span class="st">'manage-things'</span>);
     }
 }</pre>
-            <p>Read as a sentence: place an <code>Item</code> component, with this data, into the <code>core::side-navigation</code> slot, right after Core's own entry, visible only to people with <code>manage-things</code>.</p>
+            <p>Read as a sentence: place an <code>Item</code> component, with this data, into the <code>core::side-navigation</code> slot, visible only to people with <code>manage-things</code>. If something else is already registered in that slot, <code>after($id)</code>/<code>before($id)</code> (below) can anchor this entry's position relative to it, by that entry's own already-prefixed id.</p>
 
             <h4 class="sub"><code>Ux::make()</code> chain</h4>
             <div class="table-scroll">
@@ -425,16 +450,16 @@
                     <tr><td>add($component, $data)</td><td>Starts a new entry. <code>$component</code> is either an already-valid Blade tag (<code>'k::portal.navigation.item'</code>) or the component's own class (<code>Item::class</code>, as above) — Kopling resolves a class back to its tag for you, so reach for whichever reads better. <code>$data</code> is the array it receives as its one <code>data</code> prop.</td></tr>
                     <tr><td>in($slot)</td><td>The slot to place it in. Write the <strong>full</strong>, already-namespaced slot name yourself — <code>'core::side-navigation'</code>, not <code>'side-navigation'</code>. Unlike every other id on this page, Kopling never prefixes this one: a slot is a public rendezvous point every extension needs to be able to name exactly, the same way, regardless of which extension is naming it.</td></tr>
                     <tr><td>as($id)</td><td>Optional. Names this entry so other extensions can anchor before/after it, or replace/remove it. Defaults to the component string if omitted. Auto-prefixed with your extension's id, same as permissions.</td></tr>
-                    <tr><td>after($id) / before($id)</td><td>Optional. Anchors this entry's position relative to another entry's already-prefixed id (e.g. <code>'core::theme'</code>).</td></tr>
+                    <tr><td>after($id) / before($id)</td><td>Optional. Anchors this entry's position relative to another entry's already-prefixed id (e.g. <code>'yourvendor-example::hello'</code>).</td></tr>
                     <tr><td>when($condition)</td><td>Optional. A local permission id, auto-prefixed — the entry only renders for people who pass it. Leave it off and the entry always renders.</td></tr>
                     <tr><td>edit($id)</td><td>Re-selects an entry <strong>you already added earlier in this same chain</strong> so you can configure it further — for when you're not done with an entry but have since moved on to <code>add()</code>ing others. Throws if nothing in this chain has that id; this is always a typo, never an install-order concern.</td></tr>
-                    <tr><td>replace($id, $component, $data)</td><td>Overwrites another entry's component/data by its already fully-qualified id — Core's own <code>'core::theme'</code>, or anything registered by an extension that loads before yours. Anything you don't also chain here (<code>in()</code>/<code>when()</code>/etc.) keeps the original entry's value; a missing target is a no-op, same as a dangling <code>after()</code>.</td></tr>
+                    <tr><td>replace($id, $component, $data)</td><td>Overwrites another entry's component/data by its already fully-qualified id — Core's own, or anything registered by an extension that loads before yours. Anything you don't also chain here (<code>in()</code>/<code>when()</code>/etc.) keeps the original entry's value; a missing target is a no-op, same as a dangling <code>after()</code>.</td></tr>
                     <tr><td>remove($id)</td><td>Removes another entry outright, by the same already fully-qualified id rule as <code>replace()</code>. Also a no-op if the target doesn't exist.</td></tr>
                     </tbody>
                 </table>
             </div>
             <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that Kopling loads <em>before</em> yours (Core always loads first) — never one that loads after, since it hasn't registered anything yet when yours runs. This is the same ordering constraint Laravel's own service providers already have, not something new this system adds.</p>
-            <p class="dim">Exactly one slot exists today: <code>core::side-navigation</code>, rendered inside every Portal's shared layout (Section 7). More slots — head assets, post actions, admin widgets — are planned as real needs prove them out, not built yet (Section 11).</p>
+            <p class="dim">Slot names are entirely up to whichever Portal layout renders them (Section 7) — there's no fixed registry of slot names to pick from. <code>core::side-navigation</code> (Admin) exists today; Community defines its own separate set (<code>core::community.sidebar</code>, <code>.topbar</code>, <code>.rail</code>, <code>.content-top</code>, <code>.composer</code>) — some of those are still empty, nothing has registered into them yet. More slots on other Portals arrive the same way: a layout author decides a region is worth exposing and gives it a name.</p>
         </section>
         <hr class="divider">
 
@@ -453,7 +478,7 @@
             <span class="sec-num">Section 10</span>
             <h2>The reference implementation</h2>
             <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, and <code>ChangesUx</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
-            <p class="dim"><code>HasPortals</code> (Section 7) and <code>CannotBeDisabled</code> (Section 5) aren't demonstrated by the reference implementation yet — only Core registers its own Portals and marks itself undisableable so far. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't either — there isn't yet a real second extension with a reason to override the first one's entries. If this page and that directory ever disagree, the code is right and this page is stale — please tell us.</p>
+            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) is still Core-only so far. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't demonstrated anywhere shipped yet — there isn't a real extension with a reason to override another one's entries. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
         <hr class="divider">
 
@@ -463,10 +488,12 @@
             <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
             <div class="oq-group">
                 <div class="oq-item"><span class="box"></span>How <code>css/</code> and <code>js/</code> actually reach the page — a core-owned outlet is planned, not yet built.</div>
-                <div class="oq-item"><span class="box"></span>UI slots beyond <code>core::side-navigation</code> — head assets, post actions, admin widgets — as real needs prove them out; <code>ChangesUx</code> (Section 8) supports any named slot, but only one is wired up today.</div>
-                <div class="oq-item"><span class="box"></span>No first-party extension registers its own Portal (Section 7) yet — the Moderation portal named in the charter (D29) is the planned proof case.</div>
+                <div class="oq-item"><span class="box"></span>Most of Community's own slots (<code>core::community.sidebar</code>/<code>.rail</code>/<code>.content-top</code>/<code>.composer</code>) are wired up but still empty — nothing registers into them yet. Head assets, post actions, and other Portals' own slots are further out, as real needs prove them out; <code>ChangesUx</code> (Section 8) already supports any named slot a layout author chooses to expose.</div>
+                <div class="oq-item"><span class="box"></span><code>kopling/admin</code> (the Admin portal, split out of Core) is the first extension to register its own Portal (Section 7) — the Moderation portal named in the charter (D29) is the next planned proof case.</div>
+                <div class="oq-item"><span class="box"></span>Extension load order isn't controllable yet — Core always loads first, but every Composer-discovered extension (including <code>kopling/admin</code>) loads in whatever order gets discovered, not something you can influence today. This matters if you want to <code>after()</code>/<code>before()</code>/<code>replace()</code>/<code>remove()</code> (Section 8) against another extension's entries: it only works if that extension loads before yours. A <code>composer.json</code>-declared load priority is the likely fix, not designed or built yet.</div>
                 <div class="oq-item"><span class="box"></span>No way for an admin to disable an installed extension exists yet at all — <code>CannotBeDisabled</code> (Section 5) is the guard for that future toggle, built ahead of the toggle itself so the guarantee is never missing on day one.</div>
-                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>HasPortals</code>, <code>ChangesUx</code>, and <code>CannotBeDisabled</code>, as further real needs (listeners, settings) prove themselves out.</div>
+                <div class="oq-item"><span class="box"></span>Theme overrides (Section 5, <code>ChangesTheme</code>) have no interactive editor yet — an admin UI with live preview is deferred, not forgotten. Selecting between multiple simultaneously-installed themes isn't solved either; today every installed theme's tokens just get merged together.</div>
+                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>HasPortals</code>, <code>ChangesUx</code>, <code>CannotBeDisabled</code>, and <code>ChangesTheme</code>, as further real needs (listeners, settings) prove themselves out.</div>
                 <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated.</div>
                 <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
                 <div class="oq-item"><span class="box"></span>No admin UI yet for assigning permissions to groups — only a PHP API (<code>Group::givePermissionTo()</code>/<code>revokePermissionTo()</code>).</div>
