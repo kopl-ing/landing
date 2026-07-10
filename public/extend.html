@@ -180,9 +180,10 @@
         <a href="#permissions">6. Permissions</a>
         <a href="#portals">7. Portals</a>
         <a href="#ux-slots">8. UI slots</a>
-        <a href="#icon">9. Icon</a>
-        <a href="#reference">10. The reference implementation</a>
-        <a href="#open">11. Still evolving</a>
+        <a href="#authentication">9. Authentication</a>
+        <a href="#icon">10. Icon</a>
+        <a href="#reference">11. The reference implementation</a>
+        <a href="#open">12. Still evolving</a>
     </nav>
 
     <div class="doc-body">
@@ -319,6 +320,7 @@
     <span class="cm">// ...name(), description() as above -- nothing else to implement</span>
 }</pre>
             <p>This isn't only Core's own escape hatch. A hosting provider bundling their install with an extension they don't want a community admin able to turn off — a required moderation tool, something their terms of service depend on — implements the same marker on their own extension, no different from Core doing it on itself.</p>
+            <p><code>kopling/admin</code> is exactly this case: it ships bundled by default and implements <code>CannotBeDisabled</code>, so a community admin can never switch it off from inside a running install. That's a runtime guarantee, not a deployment one — an operator who doesn't want an admin panel at all (a CI/CD-deployed install, or a large community running its own moderation-only panel with fewer features instead) removes <code>kopling/admin</code> from their <code>composer.json</code> before install. It's simply never registered; there's no "disabled but present" state for <code>CannotBeDisabled</code> to guard against at that point. The marker only stops a signed-in admin from switching it off inside a live site — it was never meant to stop an operator from not installing it.</p>
         </section>
         <hr class="divider">
 
@@ -357,7 +359,7 @@
         <section id="portals">
             <span class="sec-num">Section 7</span>
             <h2>Portals</h2>
-            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Kopling ships two: <code>core::community</code> (path <code>''</code>, the default site) and <code>core::admin</code> (path <code>admin</code>). Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of, the same way a Moderation portal for large communities is expected to arrive later as a first-party extension (the charter's own proof case for this system, Section 9 &amp; D29).</p>
+            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Core registers one, <code>core::community</code> (path <code>''</code>, the default site); the Admin surface, <code>kopling-admin::admin</code> (path <code>admin</code>), is registered by <code>kopling/admin</code> — an ordinary extension, bundled by default, not part of Core itself. Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of, the same way a Moderation portal for large communities is expected to arrive later as a first-party extension (the charter's own proof case for this system, Section 9 &amp; D29).</p>
             <p>Most extensions never need to register a Portal at all — putting a link into an <em>existing</em> Portal (Section 8, UI slots) is the common case. Reach for <code>HasPortals</code> only when you're building a genuinely separate surface — its own route, its own layout, its own optional gate on entry — not just another page inside the Community or Admin portal.</p>
 
             <h4 class="sub">A Portal is not a gating mechanism</h4>
@@ -463,8 +465,80 @@
         </section>
         <hr class="divider">
 
-        <section id="icon">
+        <section id="authentication">
             <span class="sec-num">Section 9</span>
+            <h2>Authentication</h2>
+            <p>Core owns the <code>/login</code> and <code>/register</code> pages, their routes, and the whole request lifecycle around them — throttling, session handling, the redirect after a successful sign-in. What it deliberately has no opinion about is what "credentials" even means. That's a login-method extension's job: username/password is the obvious first one, but a magic-link, a passkey, or an OAuth provider are exactly as valid, and none of them are special-cased. Instead of a form Core expects you to fill in, you get two events.</p>
+
+            <h4 class="sub">ValidateLogin: a pure gate, nothing to hand back</h4>
+            <p>Dispatched first, before Core's own throttle check, carrying only the request:</p>
+            <pre class="code"><span class="kw">namespace</span> Kopling\Core\Authentication\Event;
+
+<span class="kw">readonly class</span> <span class="fn">ValidateLogin</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">public</span> Request <span class="kw">$request</span>)
+    {}
+}</pre>
+            <p>A listener that wants to reject the attempt outright — a captcha check is the motivating case — throws directly from inside itself. There's nothing else for it to communicate, so Core discards whatever a listener returns here; the only signal is whether something throws.</p>
+
+            <h4 class="sub">AttemptLogin: carries an outcome, not just a pass/fail</h4>
+            <p>Dispatched once <code>ValidateLogin</code> passes. Unlike it, this one has to hand back a real result — <em>who</em> logged in, or a reason it didn't — so it's a mutable event with two fluent outcome methods, not a plain, read-only DTO:</p>
+            <pre class="code"><span class="kw">namespace</span> Kopling\Core\Authentication\Event;
+
+<span class="kw">class</span> <span class="fn">AttemptLogin</span>
+{
+    <span class="kw">public</span> ?Person <span class="kw">$person</span> = <span class="kw">null</span>;
+    <span class="kw">public</span> ValidationException <span class="kw">$e</span>;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">readonly public</span> Request <span class="kw">$request</span>)
+    {
+        <span class="kw">$this</span>-&gt;e = ValidationException::withMessages([]);
+    }
+
+    <span class="kw">public function</span> <span class="fn">succeeded</span>(Person <span class="kw">$person</span>): <span class="st">self</span>
+    {
+        <span class="kw">$this</span>-&gt;person = <span class="kw">$person</span>;
+
+        <span class="kw">return</span> <span class="kw">$this</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">failed</span>(ValidationException <span class="kw">$e</span>): <span class="st">self</span>
+    {
+        <span class="kw">$this</span>-&gt;e = <span class="kw">$e</span>;
+
+        <span class="kw">return</span> <span class="kw">$this</span>;
+    }
+}</pre>
+            <p>Your listener reads whatever fields it cares about off <code>$event->request</code> — Core never inspects the request body itself, so whether that's <code>email</code>+<code>password</code>, a one-time token, or nothing at all is entirely your extension's decision. Resolve a real <code>Person</code> and call <code>$event->succeeded($person)</code>, or call <code>$event->failed($validationException)</code> with your own message, keyed however your own form's fields are actually named — Core has no field name of its own to key against, so it never could have built this message for you. Core calls <code>Auth::login()</code> itself once <code>$event->person</code> is set; a listener never establishes the session by hand.</p>
+            <p class="dim">The default, un-set <code>$e</code> is an empty <code>ValidationException::withMessages([])</code> — chosen so a login attempt with no login-method extension installed at all degrades to a silent redirect back rather than a hard error. It's a known gap, not a feature: there's no visible message telling anyone <em>why</em> nothing happened. Install a real login-method extension and this doesn't come up.</p>
+
+            <h4 class="sub">Registering a listener, today</h4>
+            <p>There's no dedicated contract for this yet — the same gap Section 12 already names ahead of time for events generally. The one place your extension's own code is guaranteed to run before requests are handled is <code>routes/web.php</code> (Section 4), so that's where a listener goes for now, alongside your <code>Route::</code> declarations:</p>
+            <pre class="code"><span class="cm">// yourvendor-auth-password/routes/web.php</span>
+
+<span class="kw">use</span> Illuminate\Support\Facades\Event;
+<span class="kw">use</span> Illuminate\Support\Facades\Hash;
+<span class="kw">use</span> Illuminate\Validation\ValidationException;
+<span class="kw">use</span> Kopling\Core\Authentication\Event\AttemptLogin;
+<span class="kw">use</span> Kopling\Core\People\Person;
+
+Event::listen(AttemptLogin::class, <span class="kw">function</span> (AttemptLogin <span class="kw">$event</span>) {
+    <span class="kw">$person</span> = Person::where(<span class="st">'email'</span>, <span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'email'</span>))-&gt;first();
+
+    <span class="kw">if</span> (<span class="kw">$person</span> &amp;&amp; Hash::check(<span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'password'</span>), <span class="kw">$person</span>-&gt;password)) {
+        <span class="kw">return</span> <span class="kw">$event</span>-&gt;succeeded(<span class="kw">$person</span>);
+    }
+
+    <span class="kw">return</span> <span class="kw">$event</span>-&gt;failed(ValidationException::withMessages([
+        <span class="st">'email'</span> =&gt; trans(<span class="st">'auth.failed'</span>),
+    ]));
+});</pre>
+            <p class="dim">This works because <code>routes/web.php</code> is genuinely required and executed at boot, not because it's the intended final shape — a real listener-registration point (part of the still-unbuilt <code>Kopling\Extend\*</code>, Section 12) is likely to replace this. Treat it as correct today, not as settled API.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="icon">
+            <span class="sec-num">Section 10</span>
             <h2>Icon</h2>
             <p>An <code>icon/</code> directory with a square PNG represents your extension anywhere Kopling lists installed extensions.</p>
             <div class="card-list">
@@ -475,15 +549,15 @@
         <hr class="divider">
 
         <section id="reference">
-            <span class="sec-num">Section 10</span>
+            <span class="sec-num">Section 11</span>
             <h2>The reference implementation</h2>
             <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, and <code>ChangesUx</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
-            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) is still Core-only so far. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't demonstrated anywhere shipped yet — there isn't a real extension with a reason to override another one's entries. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
+            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't demonstrated anywhere shipped yet — there isn't a real extension with a reason to override another one's entries. Authentication (Section 9) has no shipped example at all yet — the events are real and dispatched on every login attempt, but no extension listens to them yet; the <code>Event::listen()</code> snippet in that section is illustrative, not copied from a working extension the way the rest of this page's examples are. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
         <hr class="divider">
 
         <section id="open">
-            <span class="sec-num">Section 11</span>
+            <span class="sec-num">Section 12</span>
             <h2>Still evolving</h2>
             <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
             <div class="oq-group">
@@ -494,7 +568,8 @@
                 <div class="oq-item"><span class="box"></span>No way for an admin to disable an installed extension exists yet at all — <code>CannotBeDisabled</code> (Section 5) is the guard for that future toggle, built ahead of the toggle itself so the guarantee is never missing on day one.</div>
                 <div class="oq-item"><span class="box"></span>Theme overrides (Section 5, <code>ChangesTheme</code>) have no interactive editor yet — an admin UI with live preview is deferred, not forgotten. Selecting between multiple simultaneously-installed themes isn't solved either; today every installed theme's tokens just get merged together.</div>
                 <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>HasPortals</code>, <code>ChangesUx</code>, <code>CannotBeDisabled</code>, and <code>ChangesTheme</code>, as further real needs (listeners, settings) prove themselves out.</div>
-                <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated.</div>
+                <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated. Authentication (Section 9) is the first concrete case waiting on this: registering a <code>ValidateLogin</code>/<code>AttemptLogin</code> listener today means calling Laravel's own <code>Event::listen()</code> from your extension's <code>routes/web.php</code>, not a Kopling-owned registration point.</div>
+                <div class="oq-item"><span class="box"></span>No login-method extension exists yet (Section 9) — <code>ValidateLogin</code>/<code>AttemptLogin</code> are dispatched for real on every <code>/login</code> POST, but nothing listens. Every attempt today fails silently: an empty, unkeyed validation error with no visible message, not a crash. Building the first one (username/password) is the next real proof case for this whole mechanism.</div>
                 <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
                 <div class="oq-item"><span class="box"></span>No admin UI yet for assigning permissions to groups — only a PHP API (<code>Group::givePermissionTo()</code>/<code>revokePermissionTo()</code>).</div>
             </div>
