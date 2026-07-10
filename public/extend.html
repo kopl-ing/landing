@@ -178,9 +178,11 @@
         <a href="#conventions">4. Directory conventions</a>
         <a href="#contracts">5. Contracts</a>
         <a href="#permissions">6. Permissions</a>
-        <a href="#icon">7. Icon</a>
-        <a href="#reference">8. The reference implementation</a>
-        <a href="#open">9. Still evolving</a>
+        <a href="#portals">7. Portals</a>
+        <a href="#ux-slots">8. UI slots</a>
+        <a href="#icon">9. Icon</a>
+        <a href="#reference">10. The reference implementation</a>
+        <a href="#open">11. Still evolving</a>
     </nav>
 
     <div class="doc-body">
@@ -278,6 +280,23 @@
     }
 }</pre>
             <p>You only implement the contracts relevant to your extension — Kopling checks for each one independently, so adding a new contract in a future release never affects extensions that don't use it.</p>
+            <div class="card-list">
+                <div class="row"><span class="k">RequestsStorageDriver</span><p>Declares a storage driver your extension provides. Example above.</p></div>
+                <div class="row"><span class="k">HasPermissions</span><p>Declares granular, admin-grantable permissions. Section 6.</p></div>
+                <div class="row"><span class="k">HasPortals</span><p>Registers a new named UI surface — its own route and layout. Section 7.</p></div>
+                <div class="row"><span class="k">ChangesUx</span><p>Places UI, like a nav link, into an existing slot on any Portal. Section 8.</p></div>
+                <div class="row"><span class="k">CannotBeDisabled</span><p>A marker — no method at all. See below.</p></div>
+            </div>
+
+            <h4 class="sub"><code>CannotBeDisabled</code>: a marker, not a capability</h4>
+            <p>Kopling doesn't yet have a way for an admin to disable an installed extension at all — that logic is still to come. This contract exists ahead of it anyway, so the guarantee is in place from day one rather than retrofitted once disabling exists: whatever eventually implements that toggle must refuse for any <code>Extension</code> implementing this marker.</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\CannotBeDisabled;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> CannotBeDisabled
+{
+    <span class="cm">// ...name(), description() as above -- nothing else to implement</span>
+}</pre>
+            <p>This isn't only Core's own escape hatch. A hosting provider bundling their install with an extension they don't want a community admin able to turn off — a required moderation tool, something their terms of service depend on — implements the same marker on their own extension, no different from Core doing it on itself.</p>
         </section>
         <hr class="divider">
 
@@ -313,8 +332,114 @@
         </section>
         <hr class="divider">
 
-        <section id="icon">
+        <section id="portals">
             <span class="sec-num">Section 7</span>
+            <h2>Portals</h2>
+            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Kopling ships two: <code>core::community</code> (path <code>''</code>, the default site) and <code>core::admin</code> (path <code>admin</code>). Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of, the same way a Moderation portal for large communities is expected to arrive later as a first-party extension (the charter's own proof case for this system, Section 9 &amp; D29).</p>
+            <p>Most extensions never need to register a Portal at all — putting a link into an <em>existing</em> Portal (Section 8, UI slots) is the common case. Reach for <code>HasPortals</code> only when you're building a genuinely separate surface — its own route, its own layout, its own optional gate on entry — not just another page inside the Community or Admin portal.</p>
+
+            <h4 class="sub">A Portal is not a gating mechanism</h4>
+            <p>Registering a Portal never replaces checking permissions on your own routes. Kopling has no "is this person an admin" flag anywhere — every action still checks its own granular <code>Permission</code>, exactly as it would outside a Portal. A Portal's own optional gate (below) covers only that Portal's single root route; anything else your extension registers under that same path prefix gates itself independently, the normal way.</p>
+
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\HasPortals;
+<span class="kw">use</span> Kopling\Core\Portal\Portal;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> HasPortals
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;Portal&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">portals</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [
+            <span class="kw">new</span> Portal(
+                id: <span class="st">'moderation'</span>,
+                label: <span class="st">'Moderation'</span>,
+                path: <span class="st">'moderation'</span>,
+                layout: <span class="st">'yourvendor-example::layouts.moderation'</span>,
+                permission: <span class="st">'moderate'</span>,
+            ),
+        ];
+    }
+}</pre>
+            <p>As with permission ids (Section 6), write only the local part — <code>moderation</code>, not <code>yourvendor-example::moderation</code>. Kopling prefixes it the same way, for the same collision-safety reason: your Portal ends up registered and routable as <code>yourvendor-example::moderation</code>, at <code>/moderation</code>.</p>
+
+            <h4 class="sub">Portal fields</h4>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>Field</th><th>What it's for</th></tr></thead>
+                    <tbody>
+                    <tr><td>id</td><td>Local id, auto-prefixed with your extension's id — becomes the route name.</td></tr>
+                    <tr><td>label</td><td>Display name, shown in the Portal's header and anywhere Kopling lists Portals.</td></tr>
+                    <tr><td>path</td><td>The route path your Portal is registered at, e.g. <code>'moderation'</code> → <code>/moderation</code>. <code>''</code> registers at the root.</td></tr>
+                    <tr><td>layout</td><td>A Blade view name — conventionally a thin wrapper delegating to <code>&lt;x-k::portal.layout&gt;</code> (below).</td></tr>
+                    <tr><td>permission</td><td>Optional. A local permission id, auto-prefixed, that gates this Portal's own root route only — leave it <code>null</code> to leave the root open.</td></tr>
+                    <tr><td>middleware</td><td>Optional. Overrides the default <code>web</code> middleware group on the Portal's root route.</td></tr>
+                    <tr><td>icon</td><td>Optional. Reserved for representing the Portal visually; not yet wired up anywhere.</td></tr>
+                    <tr><td>description</td><td>Optional. A one-line description of what the Portal is for.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="sub">What registering a Portal actually does</h4>
+            <p>Kopling registers exactly one route per Portal: a <code>GET</code> at <code>path</code>, named after the fully-prefixed <code>id</code>. Visiting it checks <code>permission</code> (if you set one) against the signed-in person, then renders <code>layout</code> with the Portal instance bound to it as <code>$portal</code> — the same mechanism Kopling's own Community and Admin portals run through, no special case for either.</p>
+            <p>Your <code>layout</code> is expected to be a thin wrapper, the same way Kopling's own are:</p>
+            <pre class="code"><span class="cm">&lt;!-- yourvendor-example/views/layouts/moderation.blade.php --&gt;</span>
+
+&lt;x-k::portal.layout portal=<span class="st">"yourvendor-example::moderation"</span>&gt;
+    @yield(<span class="st">'content'</span>)
+&lt;/x-k::portal.layout&gt;</pre>
+            <p><code>&lt;x-k::portal.layout&gt;</code> is the one shared shell every Portal renders through — head, a side-navigation region, a header showing <code>label</code>, and a main content slot — so individual Portal layouts never duplicate that chrome. What actually shows up in the side navigation isn't decided by which Portal it is; every Portal renders the exact same <code>core::side-navigation</code> slot, filled by whatever <code>ChangesUx</code> entries pass their own permission check (Section 8) — that's true for the Admin portal today, and it's true for any Portal you register too.</p>
+        </section>
+        <hr class="divider">
+
+        <section id="ux-slots">
+            <span class="sec-num">Section 8</span>
+            <h2>UI slots</h2>
+            <p>Putting your own UI into a Portal you don't own — a link in the Admin portal's side navigation, for instance — is the <code>ChangesUx</code> contract, not <code>HasPortals</code>. This is the common case: most extensions place a few things into an existing Portal and never register one of their own.</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\ChangesUx;
+<span class="kw">use</span> Kopling\Core\Ux\Portal\Navigation\Item;
+<span class="kw">use</span> Kopling\Core\Ux\Ux;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> ChangesUx
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="kw">public function</span> <span class="fn">ux</span>(): <span class="st">Ux</span>
+    {
+        <span class="kw">return</span> Ux::make()
+            -&gt;add(Item::class, [<span class="st">'label'</span> =&gt; <span class="st">'Hello'</span>, <span class="st">'route'</span> =&gt; <span class="st">'example.hello'</span>])
+            -&gt;in(<span class="st">'core::side-navigation'</span>)
+            -&gt;as(<span class="st">'hello'</span>)
+            -&gt;after(<span class="st">'core::theme'</span>)
+            -&gt;when(<span class="st">'manage-things'</span>);
+    }
+}</pre>
+            <p>Read as a sentence: place an <code>Item</code> component, with this data, into the <code>core::side-navigation</code> slot, right after Core's own entry, visible only to people with <code>manage-things</code>.</p>
+
+            <h4 class="sub"><code>Ux::make()</code> chain</h4>
+            <div class="table-scroll">
+                <table class="dtable">
+                    <thead><tr><th>Method</th><th>What it's for</th></tr></thead>
+                    <tbody>
+                    <tr><td>add($component, $data)</td><td>Starts a new entry. <code>$component</code> is either an already-valid Blade tag (<code>'k::portal.navigation.item'</code>) or the component's own class (<code>Item::class</code>, as above) — Kopling resolves a class back to its tag for you, so reach for whichever reads better. <code>$data</code> is the array it receives as its one <code>data</code> prop.</td></tr>
+                    <tr><td>in($slot)</td><td>The slot to place it in. Write the <strong>full</strong>, already-namespaced slot name yourself — <code>'core::side-navigation'</code>, not <code>'side-navigation'</code>. Unlike every other id on this page, Kopling never prefixes this one: a slot is a public rendezvous point every extension needs to be able to name exactly, the same way, regardless of which extension is naming it.</td></tr>
+                    <tr><td>as($id)</td><td>Optional. Names this entry so other extensions can anchor before/after it, or replace/remove it. Defaults to the component string if omitted. Auto-prefixed with your extension's id, same as permissions.</td></tr>
+                    <tr><td>after($id) / before($id)</td><td>Optional. Anchors this entry's position relative to another entry's already-prefixed id (e.g. <code>'core::theme'</code>).</td></tr>
+                    <tr><td>when($condition)</td><td>Optional. A local permission id, auto-prefixed — the entry only renders for people who pass it. Leave it off and the entry always renders.</td></tr>
+                    <tr><td>edit($id)</td><td>Re-selects an entry <strong>you already added earlier in this same chain</strong> so you can configure it further — for when you're not done with an entry but have since moved on to <code>add()</code>ing others. Throws if nothing in this chain has that id; this is always a typo, never an install-order concern.</td></tr>
+                    <tr><td>replace($id, $component, $data)</td><td>Overwrites another entry's component/data by its already fully-qualified id — Core's own <code>'core::theme'</code>, or anything registered by an extension that loads before yours. Anything you don't also chain here (<code>in()</code>/<code>when()</code>/etc.) keeps the original entry's value; a missing target is a no-op, same as a dangling <code>after()</code>.</td></tr>
+                    <tr><td>remove($id)</td><td>Removes another entry outright, by the same already fully-qualified id rule as <code>replace()</code>. Also a no-op if the target doesn't exist.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that Kopling loads <em>before</em> yours (Core always loads first) — never one that loads after, since it hasn't registered anything yet when yours runs. This is the same ordering constraint Laravel's own service providers already have, not something new this system adds.</p>
+            <p class="dim">Exactly one slot exists today: <code>core::side-navigation</code>, rendered inside every Portal's shared layout (Section 7). More slots — head assets, post actions, admin widgets — are planned as real needs prove them out, not built yet (Section 11).</p>
+        </section>
+        <hr class="divider">
+
+        <section id="icon">
+            <span class="sec-num">Section 9</span>
             <h2>Icon</h2>
             <p>An <code>icon/</code> directory with a square PNG represents your extension anywhere Kopling lists installed extensions.</p>
             <div class="card-list">
@@ -325,20 +450,23 @@
         <hr class="divider">
 
         <section id="reference">
-            <span class="sec-num">Section 8</span>
+            <span class="sec-num">Section 10</span>
             <h2>The reference implementation</h2>
-            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, both contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
-            <p class="dim">If this page and that directory ever disagree, the code is right and this page is stale — please tell us.</p>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, and <code>ChangesUx</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p class="dim"><code>HasPortals</code> (Section 7) and <code>CannotBeDisabled</code> (Section 5) aren't demonstrated by the reference implementation yet — only Core registers its own Portals and marks itself undisableable so far. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't either — there isn't yet a real second extension with a reason to override the first one's entries. If this page and that directory ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
         <hr class="divider">
 
         <section id="open">
-            <span class="sec-num">Section 9</span>
+            <span class="sec-num">Section 11</span>
             <h2>Still evolving</h2>
             <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
             <div class="oq-group">
                 <div class="oq-item"><span class="box"></span>How <code>css/</code> and <code>js/</code> actually reach the page — a core-owned outlet is planned, not yet built.</div>
-                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code> and <code>HasPermissions</code>, as real needs (outlets, listeners, settings) prove themselves out.</div>
+                <div class="oq-item"><span class="box"></span>UI slots beyond <code>core::side-navigation</code> — head assets, post actions, admin widgets — as real needs prove them out; <code>ChangesUx</code> (Section 8) supports any named slot, but only one is wired up today.</div>
+                <div class="oq-item"><span class="box"></span>No first-party extension registers its own Portal (Section 7) yet — the Moderation portal named in the charter (D29) is the planned proof case.</div>
+                <div class="oq-item"><span class="box"></span>No way for an admin to disable an installed extension exists yet at all — <code>CannotBeDisabled</code> (Section 5) is the guard for that future toggle, built ahead of the toggle itself so the guarantee is never missing on day one.</div>
+                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>HasPortals</code>, <code>ChangesUx</code>, and <code>CannotBeDisabled</code>, as further real needs (listeners, settings) prove themselves out.</div>
                 <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated.</div>
                 <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
                 <div class="oq-item"><span class="box"></span>No admin UI yet for assigning permissions to groups — only a PHP API (<code>Group::givePermissionTo()</code>/<code>revokePermissionTo()</code>).</div>
