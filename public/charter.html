@@ -384,6 +384,18 @@
             </div>
 
             <div class="division">
+                <div class="division-head"><h4>Design &amp; UX</h4><p>Shapes how Kopling looks, feels, and behaves — the shared visual and interaction language every surface builds on.</p></div>
+                <div class="role-kind">
+                    <h4>Design system team <span class="vacant-tag">empty</span></h4>
+                    <ul class="resp">
+                        <li>Owns the <code>&lt;x-k::*&gt;</code> Blade component library — props, behavior, and accessibility contracts (Section 9, Styling)</li>
+                        <li>Maintains the daisyUI theme, brand tokens, and runtime CSS-variable theming so admins can re-brand without a rebuild</li>
+                        <li>Reviews new and outlet-facing UI for design-system consistency before it ships</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="division">
                 <div class="division-head"><h4>Content</h4><p>Makes Kopling understandable, in people's own language.</p></div>
                 <div class="role-kind">
                     <h4>Documentation team <span class="vacant-tag">empty</span></h4>
@@ -627,6 +639,7 @@
                     <tr><td>D27</td><td>Section 5 splits "kinds of role" (authority: founder, TSC, team lead, team member, contributor at large) from "divisions" (field of work: Community, Development, Content, Growth), each with named standing teams</td><td>One flat role list mixing authority and field of work; a large WordPress-style team roster (~20+ Make teams)</td><td>Authority and field of work are different questions — "team lead" is meaningless without knowing which team; four divisions matches the scale of Rust's ~8 top-level teams, appropriate for a pre-1.0 project with one contributor today</td></tr>
                     <tr><td>D28</td><td>Teams are defined by checkable responsibilities, not covers/doesn't-cover boundaries; a role-removal mechanic (the seat goes vacant, not the person) sits in Section 7 alongside reduced-activity/emeritus</td><td>Covers/doesn't-cover boundary language; no mechanism for an unmet responsibility beyond the general activity-state check</td><td>Boundaries imply no overlap, which isn't true in practice — a checkable duty is what's fair to measure; underperformance and burnout need different no-blame responses, and losing a seat shouldn't cost someone standing already earned (Section 6)</td></tr>
                     <tr><td>D29</td><td>UI organized into named "Portals" (not "Frontends"), gated by granular per-action permissions instead of a hardcoded admin flag; a Portal is a registrable pattern, not fixed to exactly two</td><td>"Frontend" terminology; Flarum's binary admin-access model; hardcoding Community/Admin as the only two surfaces forever</td><td>A binary admin flag was a real, lived Flarum flaw — no way to grant partial admin access; that granularity matters most for support/staffing communities (Section 2, item 4); proving Portals are generatable via a real Moderation portal mirrors how a first-party extension proves the extension API before it freezes</td></tr>
+                    <tr><td>D30</td><td>Added a fifth division, "Design &amp; UX", with one team (Design system team)</td><td>Folding design-system/theming work into Development or Growth</td><td>Design-system and theming work (<code>&lt;x-k::*&gt;</code>, daisyUI, brand tokens) is real, ongoing, and distinct from either building the backend or marketing the product — naming it gives it a real home instead of hiding it inside an unrelated division</td></tr>
                     </tbody>
                 </table>
             </div>
