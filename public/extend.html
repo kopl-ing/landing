@@ -70,6 +70,11 @@
         .live-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
+        .dev-banner{background:var(--signal);color:#fff}
+        .dev-banner-inner{display:flex;align-items:center;gap:12px;padding:14px 0;font-size:.92rem;line-height:1.45}
+        .dev-banner svg{flex-shrink:0}
+        .dev-banner strong{font-weight:700}
+
         .doc-layout{display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start;padding-top:56px;padding-bottom:100px}
         .toc{position:sticky;top:88px;border-left:2px solid var(--line);padding-left:18px;max-height:calc(100vh - 110px);overflow-y:auto}
         .toc-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--delft);margin:16px 0 10px;display:block}
@@ -115,11 +120,6 @@
         .code .st{color:#BFD3F2}
         .code .fn{color:#9FD8B8}
 
-        .oq-group{margin-bottom:22px}
-        .oq-group h4{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--delft);margin-bottom:10px}
-        .oq-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:.92rem;color:#28304a;max-width:68ch}
-        .oq-item .box{flex-shrink:0;width:16px;height:16px;border:1.5px solid var(--glaze-dim);border-radius:4px;margin-top:3px}
-
         footer{background:var(--delft-night);color:var(--glaze-dim);border-top:1px solid var(--line-light)}
         .foot-inner{display:flex;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:28px;gap:20px;flex-wrap:wrap;font-size:.86rem}
         .foot-inner a{color:var(--glaze)}
@@ -156,6 +156,13 @@
     </div>
 </nav>
 
+<div class="dev-banner">
+    <div class="wrap dev-banner-inner">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span><strong>Kopling is changing fast.</strong> Development is in a very active state — everything on this page, including what's defined below, can change without notice.</span>
+    </div>
+</div>
+
 <header class="dhero">
     <div class="wrap dhero-inner">
         <span class="eyebrow" style="color:var(--glaze-dim)">Living document</span>
@@ -183,7 +190,6 @@
         <a href="#authentication">9. Authentication</a>
         <a href="#icon">10. Icon</a>
         <a href="#reference">11. The reference implementation</a>
-        <a href="#open">12. Still evolving</a>
     </nav>
 
     <div class="doc-body">
@@ -233,12 +239,6 @@
         <span class="kw">return</span> <span class="st">'One sentence describing what it does.'</span>;
     }
 }</pre>
-            <p>Two things worth understanding about the shape of this class, not just its syntax:</p>
-            <h4 class="sub">It's not a Laravel ServiceProvider</h4>
-            <p><code>AbstractExtension</code> has no relationship to <code>Illuminate\Support\ServiceProvider</code> at all. Laravel is the mainstream tool Kopling is built on, but extensions code against Kopling's own contract, never against Laravel directly — that way, a Laravel major version upgrade is a Kopling concern to absorb, never something every installed extension has to deal with itself. The actual Laravel wiring (registering views, routes, migrations, translations) happens inside Kopling core, in code you never write.</p>
-            <h4 class="sub">Why the base class isn't named <code>Extension</code> too</h4>
-            <p>Every extension names its own class <code>Extension</code> — deliberately, so you never have to invent or remember a class name. That only works because the class it extends is named <code>AbstractExtension</code>, not <code>Extension</code>: if the base class shared that name, your own file would need an import alias to tell the two apart. One small naming choice removes an entire category of boilerplate you'd otherwise hit on every extension you ever write.</p>
-            <p class="dim">Kopling's own classes are never marked <code>final</code>. You can always extend or override, on purpose — that stays true everywhere in Kopling, not just here.</p>
         </section>
         <hr class="divider">
 
@@ -250,7 +250,7 @@
                 <table class="dtable">
                     <thead><tr><th>Path</th><th>What it does</th><th>Notes</th></tr></thead>
                     <tbody>
-                    <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace built from your full package name, vendor included, hyphenated — <code>yourvendor/example</code> becomes <code>yourvendor-example::</code>, so a template renders as <code>view('yourvendor-example::hello')</code>. The vendor stays in the namespace on purpose: two different vendors can each publish an extension called <code>example</code>, and dropping the vendor would make their view/translation namespaces collide.</td></tr>
+                    <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace built from your full package name, vendor included, hyphenated — <code>yourvendor/example</code> becomes <code>yourvendor-example::</code>, so a template renders as <code>view('yourvendor-example::hello')</code>.</td></tr>
                     <tr><td>lang/</td><td>Translations</td><td>Same auto-registered namespace as views — <code>__('yourvendor-example::messages.hello')</code>.</td></tr>
                     <tr><td>migrations/</td><td>Database migrations</td><td>Auto-registered, no <code>database/</code> wrapper directory needed — just <code>migrations/</code> directly.</td></tr>
                     <tr><td>routes/web.php</td><td>Routes</td><td>Auto-required — but <strong>not</strong> auto-wrapped in the <code>web</code> middleware group. Your file needs its own <code>Route::middleware('web')->group(...)</code>, the same way Kopling core's own routes file does.</td></tr>
@@ -259,14 +259,16 @@
                     </tbody>
                 </table>
             </div>
-            <p class="dim">Both <code>css/</code> and <code>js/</code> are detected today; linking them onto the actual page is still an open item — see Section 8.</p>
+            <p class="dim">Both <code>css/</code> and <code>js/</code> are detected today; linking them onto the actual page isn't wired up yet.</p>
         </section>
         <hr class="divider">
 
         <section id="contracts">
             <span class="sec-num">Section 5</span>
             <h2>Contracts</h2>
-            <p>Directory conventions cover everything Kopling can infer from your extension's filesystem. A small number of capabilities can't be expressed that way — declaring that your extension provides a storage driver, for instance, isn't something a folder existing can tell us. For those, implement one of Kopling's contract interfaces on your <code>Extension</code> class:</p>
+            <p>Directory conventions (Section 4) cover everything Kopling can infer from your extension's filesystem. For anything else — a storage driver, a theme, a permission, a Portal, a UI placement, a load-order constraint — implement one of Kopling's contract interfaces on your <code>Extension</code> class. Implement only what your extension needs; each is checked independently. <code>HasPermissions</code>, <code>HasPortals</code>, and <code>ChangesUx</code> get their own sections below (6, 7, 8); everything else is documented here.</p>
+
+            <h4 class="sub"><code>RequestsStorageDriver</code>: declare a storage driver</h4>
             <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\RequestsStorageDriver;
 <span class="kw">use</span> Kopling\Core\Storage\StorageRequest;
 
@@ -280,18 +282,9 @@
         <span class="kw">return</span> [<span class="kw">new</span> StorageRequest()];
     }
 }</pre>
-            <p>You only implement the contracts relevant to your extension — Kopling checks for each one independently, so adding a new contract in a future release never affects extensions that don't use it.</p>
-            <div class="card-list">
-                <div class="row"><span class="k">RequestsStorageDriver</span><p>Declares a storage driver your extension provides. Example above.</p></div>
-                <div class="row"><span class="k">HasPermissions</span><p>Declares granular, admin-grantable permissions. Section 6.</p></div>
-                <div class="row"><span class="k">HasPortals</span><p>Registers a new named UI surface — its own route and layout. Section 7.</p></div>
-                <div class="row"><span class="k">ChangesUx</span><p>Places UI, like a nav link, into an existing slot on any Portal. Section 8.</p></div>
-                <div class="row"><span class="k">CannotBeDisabled</span><p>A marker — no method at all. See below.</p></div>
-                <div class="row"><span class="k">ChangesTheme</span><p>Ships a named theme — CSS custom-property overrides on top of the compiled default. See below.</p></div>
-            </div>
 
-            <h4 class="sub"><code>ChangesTheme</code>: a theme is just another capability, not a special case</h4>
-            <p>A "theme" isn't a separate installable concept from an extension — it's an ordinary extension that implements <code>ChangesTheme</code>, overriding whichever CSS custom properties it wants on top of the compiled default:</p>
+            <h4 class="sub"><code>ChangesTheme</code>: ship a named theme</h4>
+            <p>A theme is an ordinary extension implementing <code>ChangesTheme</code>, overriding whichever CSS custom properties it wants on top of the compiled default:</p>
             <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\ChangesTheme;
 <span class="kw">use</span> Kopling\Core\Ux\Theme\Token;
 
@@ -308,19 +301,53 @@
         ];
     }
 }</pre>
-            <p><code>Token</code> is a fixed, finite enum — the exact set of CSS custom properties the compiled theme already defines (colors and radii), never arbitrary CSS. Override only the tokens you actually want to change; anything you leave out keeps the compiled default, so a theme can be a full palette swap or a single-color tweak. Values are checked against each token's expected shape (a hex color for a color token, a CSS length for a radius token) the moment your extension is discovered — a bad value is a bug in your extension, caught immediately, not something Kopling silently works around.</p>
-            <p class="dim">No selection mechanism between multiple installed themes exists yet — every installed <code>ChangesTheme</code> extension's tokens simply get merged together. Fine with one theme installed; genuinely picking one active theme is still open (Section 11).</p>
+            <p><code>Token</code> is the fixed, finite set of CSS custom properties the compiled theme defines (colors and radii) — override only what you want changed, everything you leave out keeps the compiled default.</p>
 
-            <h4 class="sub"><code>CannotBeDisabled</code>: a marker, not a capability</h4>
-            <p>Kopling doesn't yet have a way for an admin to disable an installed extension at all — that logic is still to come. This contract exists ahead of it anyway, so the guarantee is in place from day one rather than retrofitted once disabling exists: whatever eventually implements that toggle must refuse for any <code>Extension</code> implementing this marker.</p>
+            <h4 class="sub"><code>CannotBeDisabled</code>: block the (not yet built) admin disable toggle</h4>
             <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\CannotBeDisabled;
 
 <span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> CannotBeDisabled
 {
     <span class="cm">// ...name(), description() as above -- nothing else to implement</span>
 }</pre>
-            <p>This isn't only Core's own escape hatch. A hosting provider bundling their install with an extension they don't want a community admin able to turn off — a required moderation tool, something their terms of service depend on — implements the same marker on their own extension, no different from Core doing it on itself.</p>
-            <p><code>kopling/admin</code> is exactly this case: it ships bundled by default and implements <code>CannotBeDisabled</code>, so a community admin can never switch it off from inside a running install. That's a runtime guarantee, not a deployment one — an operator who doesn't want an admin panel at all (a CI/CD-deployed install, or a large community running its own moderation-only panel with fewer features instead) removes <code>kopling/admin</code> from their <code>composer.json</code> before install. It's simply never registered; there's no "disabled but present" state for <code>CannotBeDisabled</code> to guard against at that point. The marker only stops a signed-in admin from switching it off inside a live site — it was never meant to stop an operator from not installing it.</p>
+            <p>No admin-facing disable toggle exists yet — this marker guarantees whatever eventually builds one must refuse for any <code>Extension</code> implementing it (a bundled tool a hosting provider requires stay on is the motivating case). <code>kopling/admin</code> implements it for exactly this reason. It only blocks disabling at runtime — removing the package from <code>composer.json</code> before install is unaffected.</p>
+
+            <h4 class="sub"><code>HasLoadOrder</code>: require a specific package before or after yours</h4>
+            <p>Core always loads first; every other extension otherwise loads alphabetically. Declare an explicit constraint when your extension needs a specific package loaded first — placing something into a Portal another extension registers, for instance:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\LoadOrder\HasLoadOrder;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> HasLoadOrder
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;string&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">loadAfter</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [<span class="st">'kopling/admin'</span>];
+    }
+
+    <span class="cm">/** @return array&lt;string&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">loadBefore</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [];
+    }
+}</pre>
+            <p>A package that isn't installed is silently ignored, never an error.</p>
+
+            <h4 class="sub"><code>InfluencesLoadOrder</code>: require load order for anything implementing a contract you own</h4>
+            <p>Use this instead of <code>HasLoadOrder</code> when you own a contract and need every extension implementing it ordered relative to you, without knowing which packages will implement it:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\LoadOrder\Directive;
+<span class="kw">use</span> Kopling\Core\Extension\LoadOrder\InfluencesLoadOrder;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> InfluencesLoadOrder
+{
+    <span class="cm">/** @return array&lt;class-string, Directive&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">loadOrderRules</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [YourContract::class =&gt; Directive::After];
+    }
+}</pre>
+            <p>Matched via <code>instanceof</code> against every discovered extension. A matched extension's own explicit <code>HasLoadOrder</code> wins if the two disagree.</p>
         </section>
         <hr class="divider">
 
@@ -348,7 +375,7 @@
     }
 }</pre>
             <p>Write only the local part of the id — <code>manage-things</code>, not <code>yourvendor-example::manage-things</code>. Kopling prefixes it with your extension's own id before it's ever registered, joined with <code>::</code> — the same separator, and the same reason, as your view and translation namespaces (Section 4) — so you never have to worry about another extension picking the same name.</p>
-            <p><code>label</code>/<code>description</code> go through your extension's own <code>lang/</code> (Section 4) with Laravel's <code>__()</code> helper, the same as any other user-facing string — never a hardcoded string in whatever language you happened to write the extension in. By the time <code>permissions()</code> is called, your <code>lang/</code> is already registered, so the translation resolves correctly.</p>
+            <p><code>label</code>/<code>description</code> go through your extension's own <code>lang/</code> (Section 4) with Laravel's <code>__()</code> helper, the same as any other user-facing string — never a hardcoded string in whatever language you happened to write the extension in.</p>
             <h4 class="sub">Recommended naming</h4>
             <p>Verb-noun, lowercase, hyphenated — <code>manage-things</code>, <code>view-reports</code>, <code>delete-things</code> — matching the shape of core's own permissions (<code>core::manage-people</code>), so an admin's permission list reads consistently across every installed extension instead of as a patchwork of each author's own style.</p>
             <h4 class="sub">The callback is an escape hatch, not the default</h4>
@@ -359,7 +386,7 @@
         <section id="portals">
             <span class="sec-num">Section 7</span>
             <h2>Portals</h2>
-            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Core registers one, <code>core::community</code> (path <code>''</code>, the default site); the Admin surface, <code>kopling-admin::admin</code> (path <code>admin</code>), is registered by <code>kopling/admin</code> — an ordinary extension, bundled by default, not part of Core itself. Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of, the same way a Moderation portal for large communities is expected to arrive later as a first-party extension (the charter's own proof case for this system, Section 9 &amp; D29).</p>
+            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Core registers one, <code>core::community</code> (path <code>''</code>, the default site); the Admin surface, <code>kopling-admin::admin</code> (path <code>admin</code>), is registered by <code>kopling/admin</code> — an ordinary extension, bundled by default, not part of Core itself. Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of.</p>
             <p>Most extensions never need to register a Portal at all — putting a link into an <em>existing</em> Portal (Section 8, UI slots) is the common case. Reach for <code>HasPortals</code> only when you're building a genuinely separate surface — its own route, its own layout, its own optional gate on entry — not just another page inside the Community or Admin portal.</p>
 
             <h4 class="sub">A Portal is not a gating mechanism</h4>
@@ -417,7 +444,7 @@
 
     @yield(<span class="st">'content'</span>)
 &lt;/x-k::portal.layout&gt;</pre>
-            <p>This is deliberate: Kopling's own Community and Admin portals don't share one fixed shape either — Admin is a sidebar and a content area, Community is a top bar, sidebar, content, right rail, and a bottom composer region. <code>&lt;x-k::portal.slot name="..."&gt;</code> (Section 8) is the one primitive both use to resolve and render whatever's registered into a given slot name — it has no opinion about the markup around it, so your own layout is free to arrange its regions however actually fits it, with its own slot names.</p>
+            <p>Layouts aren't required to share one fixed shape — arrange your own regions and slot names however fits your Portal. <code>&lt;x-k::portal.slot name="..."&gt;</code> (Section 8) is the one primitive that resolves and renders whatever's registered into a given slot name.</p>
         </section>
         <hr class="divider">
 
@@ -460,7 +487,7 @@
                     </tbody>
                 </table>
             </div>
-            <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that Kopling loads <em>before</em> yours (Core always loads first) — never one that loads after, since it hasn't registered anything yet when yours runs. This is the same ordering constraint Laravel's own service providers already have, not something new this system adds.</p>
+            <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that loads <em>before</em> yours (Core always loads first, everything else alphabetically by default) — never one that loads after, since it hasn't registered anything yet when yours runs. Use <code>HasLoadOrder</code>/<code>InfluencesLoadOrder</code> (Section 5) if you need a specific extension ordered relative to yours.</p>
             <p class="dim">Slot names are entirely up to whichever Portal layout renders them (Section 7) — there's no fixed registry of slot names to pick from. <code>core::side-navigation</code> (Admin) exists today; Community defines its own separate set (<code>core::community.sidebar</code>, <code>.topbar</code>, <code>.rail</code>, <code>.content-top</code>, <code>.composer</code>) — some of those are still empty, nothing has registered into them yet. More slots on other Portals arrive the same way: a layout author decides a region is worth exposing and gives it a name.</p>
         </section>
         <hr class="divider">
@@ -482,7 +509,7 @@
             <p>A listener that wants to reject the attempt outright — a captcha check is the motivating case — throws directly from inside itself. There's nothing else for it to communicate, so Core discards whatever a listener returns here; the only signal is whether something throws.</p>
 
             <h4 class="sub">AttemptLogin: carries an outcome, not just a pass/fail</h4>
-            <p>Dispatched once <code>ValidateLogin</code> passes. Unlike it, this one has to hand back a real result — <em>who</em> logged in, or a reason it didn't — so it's a mutable event with two fluent outcome methods, not a plain, read-only DTO:</p>
+            <p>Dispatched once <code>ValidateLogin</code> passes. Unlike it, this one has to hand back a real result — <em>who</em> logged in, or a reason it didn't:</p>
             <pre class="code"><span class="kw">namespace</span> Kopling\Core\Authentication\Event;
 
 <span class="kw">class</span> <span class="fn">AttemptLogin</span>
@@ -513,7 +540,7 @@
             <p class="dim">The default, un-set <code>$e</code> is an empty <code>ValidationException::withMessages([])</code> — chosen so a login attempt with no login-method extension installed at all degrades to a silent redirect back rather than a hard error. It's a known gap, not a feature: there's no visible message telling anyone <em>why</em> nothing happened. Install a real login-method extension and this doesn't come up.</p>
 
             <h4 class="sub">Registering a listener, today</h4>
-            <p>There's no dedicated contract for this yet — the same gap Section 12 already names ahead of time for events generally. The one place your extension's own code is guaranteed to run before requests are handled is <code>routes/web.php</code> (Section 4), so that's where a listener goes for now, alongside your <code>Route::</code> declarations:</p>
+            <p>There's no dedicated contract for this yet. The one place your extension's own code is guaranteed to run before requests are handled is <code>routes/web.php</code> (Section 4), so that's where a listener goes for now, alongside your <code>Route::</code> declarations:</p>
             <pre class="code"><span class="cm">// yourvendor-auth-password/routes/web.php</span>
 
 <span class="kw">use</span> Illuminate\Support\Facades\Event;
@@ -533,7 +560,7 @@ Event::listen(AttemptLogin::class, <span class="kw">function</span> (AttemptLogi
         <span class="st">'email'</span> =&gt; trans(<span class="st">'auth.failed'</span>),
     ]));
 });</pre>
-            <p class="dim">This works because <code>routes/web.php</code> is genuinely required and executed at boot, not because it's the intended final shape — a real listener-registration point (part of the still-unbuilt <code>Kopling\Extend\*</code>, Section 12) is likely to replace this. Treat it as correct today, not as settled API.</p>
+            <p class="dim">Not settled API — a real listener-registration point is likely to replace this.</p>
         </section>
         <hr class="divider">
 
@@ -551,28 +578,8 @@ Event::listen(AttemptLogin::class, <span class="kw">function</span> (AttemptLogi
         <section id="reference">
             <span class="sec-num">Section 11</span>
             <h2>The reference implementation</h2>
-            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, and <code>ChangesUx</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
-            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> (Section 8) aren't demonstrated anywhere shipped yet — there isn't a real extension with a reason to override another one's entries. Authentication (Section 9) has no shipped example at all yet — the events are real and dispatched on every login attempt, but no extension listens to them yet; the <code>Event::listen()</code> snippet in that section is illustrative, not copied from a working extension the way the rest of this page's examples are. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
-        </section>
-        <hr class="divider">
-
-        <section id="open">
-            <span class="sec-num">Section 12</span>
-            <h2>Still evolving</h2>
-            <p class="dim">This is a living document. Nothing here is final — reference it, don't assume it's the last word.</p>
-            <div class="oq-group">
-                <div class="oq-item"><span class="box"></span>How <code>css/</code> and <code>js/</code> actually reach the page — a core-owned outlet is planned, not yet built.</div>
-                <div class="oq-item"><span class="box"></span>Most of Community's own slots (<code>core::community.sidebar</code>/<code>.rail</code>/<code>.content-top</code>/<code>.composer</code>) are wired up but still empty — nothing registers into them yet. Head assets, post actions, and other Portals' own slots are further out, as real needs prove them out; <code>ChangesUx</code> (Section 8) already supports any named slot a layout author chooses to expose.</div>
-                <div class="oq-item"><span class="box"></span><code>kopling/admin</code> (the Admin portal, split out of Core) is the first extension to register its own Portal (Section 7) — the Moderation portal named in the charter (D29) is the next planned proof case.</div>
-                <div class="oq-item"><span class="box"></span>Extension load order isn't controllable yet — Core always loads first, but every Composer-discovered extension (including <code>kopling/admin</code>) loads in whatever order gets discovered, not something you can influence today. This matters if you want to <code>after()</code>/<code>before()</code>/<code>replace()</code>/<code>remove()</code> (Section 8) against another extension's entries: it only works if that extension loads before yours. A <code>composer.json</code>-declared load priority is the likely fix, not designed or built yet.</div>
-                <div class="oq-item"><span class="box"></span>No way for an admin to disable an installed extension exists yet at all — <code>CannotBeDisabled</code> (Section 5) is the guard for that future toggle, built ahead of the toggle itself so the guarantee is never missing on day one.</div>
-                <div class="oq-item"><span class="box"></span>Theme overrides (Section 5, <code>ChangesTheme</code>) have no interactive editor yet — an admin UI with live preview is deferred, not forgotten. Selecting between multiple simultaneously-installed themes isn't solved either; today every installed theme's tokens just get merged together.</div>
-                <div class="oq-item"><span class="box"></span>More contract interfaces beyond <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>HasPortals</code>, <code>ChangesUx</code>, <code>CannotBeDisabled</code>, and <code>ChangesTheme</code>, as further real needs (listeners, settings) prove themselves out.</div>
-                <div class="oq-item"><span class="box"></span><code>Kopling\Extend\*</code> — a wrapped, blessed subset of Laravel primitives (Eloquent, validation, events) extensions will use directly, instead of touching Laravel itself. Not yet populated. Authentication (Section 9) is the first concrete case waiting on this: registering a <code>ValidateLogin</code>/<code>AttemptLogin</code> listener today means calling Laravel's own <code>Event::listen()</code> from your extension's <code>routes/web.php</code>, not a Kopling-owned registration point.</div>
-                <div class="oq-item"><span class="box"></span>No login-method extension exists yet (Section 9) — <code>ValidateLogin</code>/<code>AttemptLogin</code> are dispatched for real on every <code>/login</code> POST, but nothing listens. Every attempt today fails silently: an empty, unkeyed validation error with no visible message, not a crash. Building the first one (username/password) is the next real proof case for this whole mechanism.</div>
-                <div class="oq-item"><span class="box"></span>Multiple icon sizes beyond <code>lg.png</code>/<code>sm.png</code> — naming convention not yet fully settled.</div>
-                <div class="oq-item"><span class="box"></span>No admin UI yet for assigning permissions to groups — only a PHP API (<code>Group::givePermissionTo()</code>/<code>revokePermissionTo()</code>).</div>
-            </div>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>ChangesUx</code>, and <code>HasLoadOrder</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> and <code>InfluencesLoadOrder</code> (Section 5, 8) aren't demonstrated anywhere shipped yet — <code>kopling/admin</code> is the intended first <code>InfluencesLoadOrder</code> implementor, once it has a <code>HasSettings</code>-style contract worth requiring load order against. Authentication (Section 9) has no shipped example at all yet — the events are real and dispatched on every login attempt, but no extension listens to them yet; the <code>Event::listen()</code> snippet in that section is illustrative, not copied from a working extension the way the rest of this page's examples are. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
 
     </div>

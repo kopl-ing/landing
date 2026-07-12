@@ -45,6 +45,7 @@ Kopling exists so human interaction can grow into honest, real relationships —
 - Be honest and willing to disagree; name trade-offs explicitly.
 - Write everything public-facing (docs, UI strings, comments meant for contributors) in plain language for a global, largely non-native-English audience — short sentences, define jargon on first use, no unexplained governance-speak.
 - No named comparisons to other projects, no score-settling — state the reasoning, not a foil.
+- `public/extend.html` (developer + AI-agent audience) additionally: intent-first, not concept-first — open each capability with what the reader is trying to do, not what the mechanism is. Reasoning earns a place only if it changes what the reader writes next — one clause, inline, never a standalone rationale paragraph; everything else (why a design turned out this way, alternatives considered) belongs in `kopling/development`'s `.docs/planning/decisions.md`, not here. Real, working code over prose describing behavior. Every contract gets the same shape — one intent sentence, one code example, an optional one-clause gotcha — no separate summary list duplicating what the subsections already say.
 - When a real decision gets made, propose the diff to `public/charter.html` (decision + one-line rationale in its Decision Log) rather than letting it live only in chat or commit messages.
 
 ## Not yet decided (don't assume, ask if it matters for the task)
