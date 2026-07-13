@@ -253,13 +253,10 @@
                     <tr><td>views/</td><td>Blade templates</td><td>Auto-registered under a namespace built from your full package name, vendor included, hyphenated — <code>yourvendor/example</code> becomes <code>yourvendor-example::</code>, so a template renders as <code>view('yourvendor-example::hello')</code>.</td></tr>
                     <tr><td>lang/</td><td>Translations</td><td>Same auto-registered namespace as views — <code>__('yourvendor-example::messages.hello')</code>.</td></tr>
                     <tr><td>migrations/</td><td>Database migrations</td><td>Auto-registered, no <code>database/</code> wrapper directory needed — just <code>migrations/</code> directly.</td></tr>
-                    <tr><td>routes/web.php</td><td>Routes</td><td>Auto-required — but <strong>not</strong> auto-wrapped in the <code>web</code> middleware group. Your file needs its own <code>Route::middleware('web')->group(...)</code>, the same way Kopling core's own routes file does.</td></tr>
-                    <tr><td>css/</td><td>Plain, hand-written CSS</td><td>No Tailwind, no build step. For anything beyond a safelisted layout-utility subset (flex/grid/gap/spacing), reach for a <code>&lt;x-k::*&gt;</code> component instead of a custom style.</td></tr>
-                    <tr><td>js/</td><td>Plain ES modules</td><td>No bundler required — a plain <code>&lt;script type="module"&gt;</code> file is enough for the rare case that genuinely needs one.</td></tr>
                     </tbody>
                 </table>
             </div>
-            <p class="dim">Both <code>css/</code> and <code>js/</code> are detected today; linking them onto the actual page isn't wired up yet.</p>
+            <p class="dim">Routes, plain hand-written css, and plain js aren't directory conventions — each always needs a target Portal to attach to (which prefix/middleware a route inherits, which page's <code>&lt;head&gt;</code> a stylesheet renders on), so a bare "the directory exists" rule can't express them the way it can views/lang/migrations. See <code>ExtendsPortals</code> in Section 7.</p>
         </section>
         <hr class="divider">
 
@@ -377,7 +374,7 @@
             <p>Write only the local part of the id — <code>manage-things</code>, not <code>yourvendor-example::manage-things</code>. Kopling prefixes it with your extension's own id before it's ever registered, joined with <code>::</code> — the same separator, and the same reason, as your view and translation namespaces (Section 4) — so you never have to worry about another extension picking the same name.</p>
             <p><code>label</code>/<code>description</code> go through your extension's own <code>lang/</code> (Section 4) with Laravel's <code>__()</code> helper, the same as any other user-facing string — never a hardcoded string in whatever language you happened to write the extension in.</p>
             <h4 class="sub">Recommended naming</h4>
-            <p>Verb-noun, lowercase, hyphenated — <code>manage-things</code>, <code>view-reports</code>, <code>delete-things</code> — matching the shape of core's own permissions (<code>core::manage-people</code>), so an admin's permission list reads consistently across every installed extension instead of as a patchwork of each author's own style.</p>
+            <p>Verb-noun, lowercase, hyphenated — <code>manage-things</code>, <code>view-reports</code>, <code>delete-things</code> — matching the shape of core's own permissions (<code>kopling-core::manage-people</code>), so an admin's permission list reads consistently across every installed extension instead of as a patchwork of each author's own style.</p>
             <h4 class="sub">The callback is an escape hatch, not the default</h4>
             <p>Most permissions need nothing beyond a name — Kopling checks whether the signed-in person's groups have been granted it, and that's the whole decision. For the rare case that needs more (e.g. "can edit <em>this specific</em> reply," not any reply), <code>Permission</code> takes an optional callback that runs <em>in addition to</em> the grant check, never instead of it — it can only narrow access down further, never grant it on its own.</p>
         </section>
@@ -386,7 +383,7 @@
         <section id="portals">
             <span class="sec-num">Section 7</span>
             <h2>Portals</h2>
-            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Core registers one, <code>core::community</code> (path <code>''</code>, the default site); the Admin surface, <code>kopling-admin::admin</code> (path <code>admin</code>), is registered by <code>kopling/admin</code> — an ordinary extension, bundled by default, not part of Core itself. Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of.</p>
+            <p>A <strong>Portal</strong> is a named UI surface — a route prefix paired with the Blade layout its routes render inside. Core registers one, <code>kopling-core::community</code> (path <code>''</code>, the default site); the Admin surface, <code>kopling-admin::admin</code> (path <code>admin</code>), is registered by <code>kopling/admin</code> — an ordinary extension, bundled by default, not part of Core itself. Neither is special-cased — a Portal is a registrable pattern any extension can add its own instance of.</p>
             <p>Most extensions never need to register a Portal at all — putting a link into an <em>existing</em> Portal (Section 8, UI slots) is the common case. Reach for <code>HasPortals</code> only when you're building a genuinely separate surface — its own route, its own layout, its own optional gate on entry — not just another page inside the Community or Admin portal.</p>
 
             <h4 class="sub">A Portal is not a gating mechanism</h4>
@@ -424,8 +421,7 @@
                     <tr><td>label</td><td>Display name, shown in the Portal's header and anywhere Kopling lists Portals.</td></tr>
                     <tr><td>path</td><td>The route path your Portal is registered at, e.g. <code>'moderation'</code> → <code>/moderation</code>. <code>''</code> registers at the root.</td></tr>
                     <tr><td>layout</td><td>A Blade view name — conventionally a thin wrapper delegating to <code>&lt;x-k::portal.layout&gt;</code> (below).</td></tr>
-                    <tr><td>permission</td><td>Optional. A local permission id, auto-prefixed, that gates this Portal's own root route only — leave it <code>null</code> to leave the root open.</td></tr>
-                    <tr><td>middleware</td><td>Optional. Overrides the default <code>web</code> middleware group on the Portal's root route.</td></tr>
+                    <tr><td>permission</td><td>Optional. A local permission id, auto-prefixed, that gates every route attached to this Portal (see <code>ExtendsPortals</code> below) — leave it <code>null</code> to leave the Portal open.</td></tr>
                     <tr><td>icon</td><td>Optional. Reserved for representing the Portal visually; not yet wired up anywhere.</td></tr>
                     <tr><td>description</td><td>Optional. A one-line description of what the Portal is for.</td></tr>
                     </tbody>
@@ -433,8 +429,39 @@
             </div>
 
             <h4 class="sub">What registering a Portal actually does</h4>
-            <p>Kopling registers exactly one route per Portal: a <code>GET</code> at <code>path</code>, named after the fully-prefixed <code>id</code>. Visiting it checks <code>permission</code> (if you set one) against the signed-in person, then renders <code>layout</code> with the Portal instance bound to it as <code>$portal</code> — the same mechanism Kopling's own Community and Admin portals run through, no special case for either.</p>
-            <p>Your <code>layout</code> is expected to wrap <code>&lt;x-k::portal.layout&gt;</code> — the one truly shared piece, just html/head/body chrome, nothing else — and compose whichever named regions your Portal actually needs inside it:</p>
+            <p><code>HasPortals</code> only ever declares a Portal's identity — nothing renders at <code>path</code> yet. A <code>Portal</code> carries no routes, css, or js of its own: registering one is the identity, attaching to it (below) is a separate step, done through exactly one mechanism regardless of whether you're the extension that declared it or a different one entirely — no shortcut for the owner, no special case for either of Kopling's own Portals.</p>
+
+            <h4 class="sub">Attaching routes/css/js: <code>ExtendsPortals</code></h4>
+            <p>Implement <code>ExtendsPortals</code> to attach routes and/or plain hand-written css/js to a Portal — any Portal, yours or another extension's:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\Contract\ExtendsPortals;
+<span class="kw">use</span> Kopling\Core\Portal\PortalExtension;
+
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> ExtendsPortals
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;PortalExtension&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">extendsPortals</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [
+            <span class="kw">new</span> PortalExtension(<span class="st">'yourvendor-example::moderation'</span>)
+                -&gt;routes(__DIR__.<span class="st">'/../routes/web.php'</span>)
+                -&gt;css(__DIR__.<span class="st">'/../css/app.css'</span>)
+                -&gt;js(__DIR__.<span class="st">'/../js/app.js'</span>),
+        ];
+    }
+}</pre>
+            <p>The target is the Portal's already fully-qualified id — <code>'yourvendor-example::moderation'</code>, not <code>'moderation'</code> — same convention as <code>after()</code>/<code>before()</code> (Section 8): a reference to something else, never auto-prefixed. Targeting a Portal that isn't actually installed is a silent no-op, the same graceful-degradation rule a dangling <code>after()</code>/<code>before()</code> gets.</p>
+            <p>A route attached this way is grouped under its target Portal's prefix and name, and gets that Portal's middleware for free — <code>web</code>, plus <code>can:{permission}</code> if the Portal declared one — so the routes file itself needs no <code>Route::middleware(...)->group(...)</code> wrapper:</p>
+            <pre class="code"><span class="cm">// yourvendor-example/routes/web.php</span>
+
+<span class="kw">use</span> Illuminate\Support\Facades\Route;
+
+Route::get(<span class="st">'/hello'</span>, <span class="kw">fn</span> () =&gt; view(<span class="st">'yourvendor-example::hello'</span>))-&gt;name(<span class="st">'hello'</span>);</pre>
+            <p>css/js are plain, hand-written files — no Tailwind, no build step; for anything beyond a safelisted layout-utility subset (flex/grid/gap/spacing), reach for a <code>&lt;x-k::*&gt;</code> component instead of a custom style. They live inside your own package, not under <code>public/</code> — Kopling serves them itself through a small, key-based route it generates, nothing of yours to publish — and get linked onto the page automatically whenever the current request resolves to the Portal they're attached to.</p>
+
+            <h4 class="sub">Your Portal's own layout</h4>
+            <p>Wrap <code>&lt;x-k::portal.layout&gt;</code> — the one truly shared piece, just html/head/body chrome, nothing else — and compose whichever named regions your Portal actually needs inside it:</p>
             <pre class="code"><span class="cm">&lt;!-- yourvendor-example/views/layouts/moderation.blade.php --&gt;</span>
 
 &lt;x-k::portal.layout&gt;
@@ -463,13 +490,13 @@
     <span class="kw">public function</span> <span class="fn">ux</span>(): <span class="st">Ux</span>
     {
         <span class="kw">return</span> Ux::make()
-            -&gt;add(Item::class, [<span class="st">'label'</span> =&gt; <span class="st">'Hello'</span>, <span class="st">'route'</span> =&gt; <span class="st">'example.hello'</span>])
-            -&gt;in(<span class="st">'core::side-navigation'</span>)
+            -&gt;add(Item::class, [<span class="st">'label'</span> =&gt; <span class="st">'Hello'</span>, <span class="st">'route'</span> =&gt; <span class="st">'yourvendor-example::moderation/hello'</span>])
+            -&gt;in(<span class="st">'kopling-core::side-navigation'</span>)
             -&gt;as(<span class="st">'hello'</span>)
             -&gt;when(<span class="st">'manage-things'</span>);
     }
 }</pre>
-            <p>Read as a sentence: place an <code>Item</code> component, with this data, into the <code>core::side-navigation</code> slot, visible only to people with <code>manage-things</code>. If something else is already registered in that slot, <code>after($id)</code>/<code>before($id)</code> (below) can anchor this entry's position relative to it, by that entry's own already-prefixed id.</p>
+            <p>Read as a sentence: place an <code>Item</code> component, with this data, into the <code>kopling-core::side-navigation</code> slot, visible only to people with <code>manage-things</code>. If something else is already registered in that slot, <code>after($id)</code>/<code>before($id)</code> (below) can anchor this entry's position relative to it, by that entry's own already-prefixed id. <code>route</code> here is a Portal-qualified route name (Section 7) — <code>'yourvendor-example::moderation/hello'</code>, not bare <code>'hello'</code>, since every route now lives under whichever Portal it's attached to.</p>
 
             <h4 class="sub"><code>Ux::make()</code> chain</h4>
             <div class="table-scroll">
@@ -477,7 +504,7 @@
                     <thead><tr><th>Method</th><th>What it's for</th></tr></thead>
                     <tbody>
                     <tr><td>add($component, $data)</td><td>Starts a new entry. <code>$component</code> is either an already-valid Blade tag (<code>'k::portal.navigation.item'</code>) or the component's own class (<code>Item::class</code>, as above) — Kopling resolves a class back to its tag for you, so reach for whichever reads better. <code>$data</code> is the array it receives as its one <code>data</code> prop.</td></tr>
-                    <tr><td>in($slot)</td><td>The slot to place it in. Write the <strong>full</strong>, already-namespaced slot name yourself — <code>'core::side-navigation'</code>, not <code>'side-navigation'</code>. Unlike every other id on this page, Kopling never prefixes this one: a slot is a public rendezvous point every extension needs to be able to name exactly, the same way, regardless of which extension is naming it.</td></tr>
+                    <tr><td>in($slot)</td><td>The slot to place it in. Write the <strong>full</strong>, already-namespaced slot name yourself — <code>'kopling-core::side-navigation'</code>, not <code>'side-navigation'</code>. Unlike every other id on this page, Kopling never prefixes this one: a slot is a public rendezvous point every extension needs to be able to name exactly, the same way, regardless of which extension is naming it.</td></tr>
                     <tr><td>as($id)</td><td>Optional. Names this entry so other extensions can anchor before/after it, or replace/remove it. Defaults to the component string if omitted. Auto-prefixed with your extension's id, same as permissions.</td></tr>
                     <tr><td>after($id) / before($id)</td><td>Optional. Anchors this entry's position relative to another entry's already-prefixed id (e.g. <code>'yourvendor-example::hello'</code>).</td></tr>
                     <tr><td>when($condition)</td><td>Optional. A local permission id, auto-prefixed — the entry only renders for people who pass it. Leave it off and the entry always renders.</td></tr>
@@ -488,7 +515,7 @@
                 </table>
             </div>
             <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that loads <em>before</em> yours (Core always loads first, everything else alphabetically by default) — never one that loads after, since it hasn't registered anything yet when yours runs. Use <code>HasLoadOrder</code>/<code>InfluencesLoadOrder</code> (Section 5) if you need a specific extension ordered relative to yours.</p>
-            <p class="dim">Slot names are entirely up to whichever Portal layout renders them (Section 7) — there's no fixed registry of slot names to pick from. <code>core::side-navigation</code> (Admin) exists today; Community defines its own separate set (<code>core::community.sidebar</code>, <code>.topbar</code>, <code>.rail</code>, <code>.content-top</code>, <code>.composer</code>) — some of those are still empty, nothing has registered into them yet. More slots on other Portals arrive the same way: a layout author decides a region is worth exposing and gives it a name.</p>
+            <p class="dim">Slot names are entirely up to whichever Portal layout renders them (Section 7) — there's no fixed registry of slot names to pick from. <code>kopling-core::side-navigation</code> (Admin) exists today; Community defines its own separate set (<code>kopling-core::community.sidebar</code>, <code>.topbar</code>, <code>.rail</code>, <code>.content-top</code>, <code>.composer</code>) — some of those are still empty, nothing has registered into them yet. More slots on other Portals arrive the same way: a layout author decides a region is worth exposing and gives it a name.</p>
         </section>
         <hr class="divider">
 
@@ -539,28 +566,45 @@
             <p>Your listener reads whatever fields it cares about off <code>$event->request</code> — Core never inspects the request body itself, so whether that's <code>email</code>+<code>password</code>, a one-time token, or nothing at all is entirely your extension's decision. Resolve a real <code>Person</code> and call <code>$event->succeeded($person)</code>, or call <code>$event->failed($validationException)</code> with your own message, keyed however your own form's fields are actually named — Core has no field name of its own to key against, so it never could have built this message for you. Core calls <code>Auth::login()</code> itself once <code>$event->person</code> is set; a listener never establishes the session by hand.</p>
             <p class="dim">The default, un-set <code>$e</code> is an empty <code>ValidationException::withMessages([])</code> — chosen so a login attempt with no login-method extension installed at all degrades to a silent redirect back rather than a hard error. It's a known gap, not a feature: there's no visible message telling anyone <em>why</em> nothing happened. Install a real login-method extension and this doesn't come up.</p>
 
-            <h4 class="sub">Registering a listener, today</h4>
-            <p>There's no dedicated contract for this yet. The one place your extension's own code is guaranteed to run before requests are handled is <code>routes/web.php</code> (Section 4), so that's where a listener goes for now, alongside your <code>Route::</code> declarations:</p>
-            <pre class="code"><span class="cm">// yourvendor-auth-password/routes/web.php</span>
+            <h4 class="sub">Registering a listener: <code>ListensToEvents</code></h4>
+            <p>Implement <code>ListensToEvents</code> on your <code>Extension</code> class, mapping an event class to a listener class — Kopling resolves and calls it through the container, the normal Laravel way:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Authentication\Event\AttemptLogin;
+<span class="kw">use</span> Kopling\Core\Extension\Contract\ListensToEvents;
 
-<span class="kw">use</span> Illuminate\Support\Facades\Event;
-<span class="kw">use</span> Illuminate\Support\Facades\Hash;
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> ListensToEvents
+{
+    <span class="cm">// ...name(), description() as above</span>
+
+    <span class="cm">/** @return array&lt;class-string, class-string&gt; */</span>
+    <span class="kw">public function</span> <span class="fn">listen</span>(): <span class="st">array</span>
+    {
+        <span class="kw">return</span> [
+            AttemptLogin::class =&gt; AttemptPasswordLogin::class,
+        ];
+    }
+}</pre>
+            <p>The listener class itself is a plain invokable handling the event:</p>
+            <pre class="code"><span class="kw">use</span> Illuminate\Support\Facades\Hash;
 <span class="kw">use</span> Illuminate\Validation\ValidationException;
 <span class="kw">use</span> Kopling\Core\Authentication\Event\AttemptLogin;
 <span class="kw">use</span> Kopling\Core\People\Person;
 
-Event::listen(AttemptLogin::class, <span class="kw">function</span> (AttemptLogin <span class="kw">$event</span>) {
-    <span class="kw">$person</span> = Person::where(<span class="st">'email'</span>, <span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'email'</span>))-&gt;first();
+<span class="kw">class</span> <span class="fn">AttemptPasswordLogin</span>
+{
+    <span class="kw">public function</span> <span class="fn">handle</span>(AttemptLogin <span class="kw">$event</span>): AttemptLogin
+    {
+        <span class="kw">$person</span> = Person::where(<span class="st">'email'</span>, <span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'email'</span>))-&gt;first();
 
-    <span class="kw">if</span> (<span class="kw">$person</span> &amp;&amp; Hash::check(<span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'password'</span>), <span class="kw">$person</span>-&gt;password)) {
-        <span class="kw">return</span> <span class="kw">$event</span>-&gt;succeeded(<span class="kw">$person</span>);
+        <span class="kw">if</span> (<span class="kw">$person</span> &amp;&amp; Hash::check(<span class="kw">$event</span>-&gt;request-&gt;input(<span class="st">'password'</span>), <span class="kw">$person</span>-&gt;password)) {
+            <span class="kw">return</span> <span class="kw">$event</span>-&gt;succeeded(<span class="kw">$person</span>);
+        }
+
+        <span class="kw">return</span> <span class="kw">$event</span>-&gt;failed(ValidationException::withMessages([
+            <span class="st">'email'</span> =&gt; trans(<span class="st">'auth.failed'</span>),
+        ]));
     }
-
-    <span class="kw">return</span> <span class="kw">$event</span>-&gt;failed(ValidationException::withMessages([
-        <span class="st">'email'</span> =&gt; trans(<span class="st">'auth.failed'</span>),
-    ]));
-});</pre>
-            <p class="dim">Not settled API — a real listener-registration point is likely to replace this.</p>
+}</pre>
+            <p class="dim">A real, shipped example: <code>kopling/auth-email-password</code> implements exactly this, for both <code>AttemptLogin</code> and its registration counterpart.</p>
         </section>
         <hr class="divider">
 
@@ -578,8 +622,8 @@ Event::listen(AttemptLogin::class, <span class="kw">function</span> (AttemptLogi
         <section id="reference">
             <span class="sec-num">Section 11</span>
             <h2>The reference implementation</h2>
-            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>ChangesUx</code>, and <code>HasLoadOrder</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
-            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-midnight</code> ships a dark palette. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> and <code>InfluencesLoadOrder</code> (Section 5, 8) aren't demonstrated anywhere shipped yet — <code>kopling/admin</code> is the intended first <code>InfluencesLoadOrder</code> implementor, once it has a <code>HasSettings</code>-style contract worth requiring load order against. Authentication (Section 9) has no shipped example at all yet — the events are real and dispatched on every login attempt, but no extension listens to them yet; the <code>Event::listen()</code> snippet in that section is illustrative, not copied from a working extension the way the rest of this page's examples are. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>ChangesUx</code>, <code>HasLoadOrder</code>, and <code>ExtendsPortals</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-delft</code> and <code>kopling/theme-midnight</code> each ship a full palette. <code>ListensToEvents</code> (Section 9) is demonstrated by <code>kopling/auth-email-password</code>, for both login and registration. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> and <code>InfluencesLoadOrder</code> (Section 5, 8) aren't demonstrated anywhere shipped yet — <code>kopling/admin</code> is the intended first <code>InfluencesLoadOrder</code> implementor, once it has a <code>HasSettings</code>-style contract worth requiring load order against. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
 
     </div>
