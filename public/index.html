@@ -76,27 +76,23 @@
         .thread-col{justify-self:end;width:100%;max-width:460px}
         .thread{background:var(--paper);color:var(--ink);border-radius:14px;box-shadow:0 24px 60px rgba(6,12,32,.45);overflow:hidden;max-width:460px;width:100%}
         .thread-caption{font-family:var(--mono);font-size:.78rem;color:var(--glaze-dim);margin-top:14px;max-width:460px;text-align:right}
-        .thread-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
-        .thread-head strong{font-family:var(--display);font-weight:600;font-size:.95rem}
+        .moment-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
+        .moment-who{flex:1;line-height:1.3}
+        .moment-who strong{font-family:var(--display);font-weight:600;font-size:.92rem;display:block}
+        .moment-who time{font-family:var(--mono);font-size:.72rem;color:#5A6272}
         .live-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--delft)}
-        .live-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--signal)}
-        .thread-body{padding:8px 18px 14px;min-height:328px;display:flex;flex-direction:column;justify-content:flex-end}
-        .post{display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
-        .post:last-child{border-bottom:none}
+        .live-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
         .avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:#fff;font-weight:600;font-size:.8rem;font-family:var(--display)}
-        .post .meta{font-size:.78rem;color:#5A6272;font-family:var(--mono)}
-        .post .meta b{color:var(--ink);font-family:var(--body);font-weight:600;font-size:.86rem}
-        .post p{font-size:.9rem;line-height:1.45;margin-top:2px}
-        .post.incoming{animation:slidein .45s ease both}
-        .typing{display:flex;gap:5px;align-items:center;padding:10px 0 4px;height:26px}
-        .typing span{width:6px;height:6px;border-radius:50%;background:var(--glaze-dim);animation:blink 1.2s infinite}
-        .typing span:nth-child(2){animation-delay:.2s}
-        .typing span:nth-child(3){animation-delay:.4s}
-        .typing[hidden]{display:none}
-        @keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-        @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+        .moment-body{padding:16px 18px 18px}
+        .tag-badge{display:inline-block;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#fff;padding:3px 10px;border-radius:99px;margin-bottom:12px}
+        .moment-title{font-family:var(--display);font-weight:700;font-size:1.08rem;line-height:1.32;margin:0 0 7px}
+        .moment-excerpt{font-size:.9rem;line-height:1.55;color:#3A4358;margin:0}
+        .moment-actions{display:flex;align-items:center;gap:10px;margin-top:18px}
+        .reaction-pill,.reply-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.8rem;color:#5A6272;background:var(--porcelain);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+        .reaction-pill b,.reply-pill b{color:var(--ink);font-weight:700;display:inline-block}
+        .reaction-pill.bump b,.reply-pill.bump b{animation:bump .5s ease}
+        @keyframes bump{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-        .live-pill .dot{animation:pulse 2s infinite}
 
         .meaning{background:var(--delft-night);color:var(--glaze);border-top:1px solid var(--line-light)}
         .meaning-inner{display:flex;gap:20px;align-items:baseline;padding-top:20px;padding-bottom:20px;flex-wrap:wrap}
@@ -230,8 +226,7 @@
         }
         @media (prefers-reduced-motion:reduce){
             html{scroll-behavior:auto}
-            .post.incoming{animation:none}
-            .typing span,.live-pill .dot{animation:none}
+            .reaction-pill.bump b,.reply-pill.bump b,.live-pill .dot{animation:none}
             *{transition:none !important}
         }
     </style>
@@ -270,24 +265,23 @@
         </div>
 
         <div class="thread-col">
-            <div class="thread" role="img" aria-label="Demonstration of a Kopling discussion updating live: new replies appear as they are posted.">
-                <div class="thread-head">
-                    <strong>Pedal Builders · First solder joints</strong>
+            <div class="thread" role="img" aria-label="Demonstration of a Kopling Moment: a post with a tag, reactions and replies gathered as one whole thing, updating live.">
+                <div class="moment-head">
+                    <span class="avatar" style="background:#2B4A9B">MV</span>
+                    <div class="moment-who"><strong>Mara Vos</strong><time>2h ago</time></div>
                     <span class="live-pill"><span class="dot"></span>Live</span>
                 </div>
-                <div class="thread-body" id="thread-body">
-                    <div class="post">
-                        <span class="avatar" style="background:#2B4A9B">MV</span>
-                        <div><div class="meta"><b>Mara</b> · 2m</div><p>Finished the fuzz circuit tonight — first pedal that didn't hum. Posting the board photos now.</p></div>
+                <div class="moment-body">
+                    <span class="tag-badge" style="background:#DB2777">Showcase</span>
+                    <h4 class="moment-title">First solder joints — the fuzz pedal that didn't hum</h4>
+                    <p class="moment-excerpt">Swapped the 2N repro transistors for BC108s tonight — warmer breakup, way less noise than the last build.</p>
+                    <div class="moment-actions">
+                        <span class="reaction-pill" id="reaction-pill">🔥 <b id="reaction-count">3</b></span>
+                        <span class="reply-pill" id="reply-pill"><b id="reply-count">2</b> replies</span>
                     </div>
-                    <div class="post">
-                        <span class="avatar" style="background:#E8590C">JD</span>
-                        <div><div class="meta"><b>Jonas</b> · 1m</div><p>That was fast. Which transistors did you end up using?</p></div>
-                    </div>
-                    <div class="typing" id="typing" hidden><span></span><span></span><span></span></div>
                 </div>
             </div>
-            <p class="thread-caption">A real discussion on a Kopling community — replies appear live, no refresh needed.</p>
+            <p class="thread-caption">A real Moment on a Kopling community — one post, its replies and reactions gathered as one whole thing, updating live.</p>
         </div>
     </div>
 </header>
@@ -315,7 +309,7 @@
         </div>
         <div class="feature-list">
             <div class="feature"><span class="fi">1</span><div><h4>Everything lives in one Moment</h4><p>A Moment holds the whole thing — what's shared, plus every reply and reaction around it — so nothing's scattered across a feed or split off into a separate "original post."</p></div></div>
-            <div class="feature"><span class="fi">2</span><div><h4>Replies appear live</h4><p>No refresh button. A new reply shows up the moment someone posts it — like the demo above.</p></div></div>
+            <div class="feature"><span class="fi">2</span><div><h4>Replies appear live</h4><p>No refresh button. Reactions and reply counts update the moment someone responds — like the demo above.</p></div></div>
             <div class="feature"><span class="fi">3</span><div><h4>Lightweight reactions</h4><p>A quick "this is cool" counts as a real response — warmth doesn't require writing an essay.</p></div></div>
             <div class="feature"><span class="fi">4</span><div><h4>Connected to other communities</h4><p>A Kopling community can talk to other Kopling sites — and to Mastodon and the wider fediverse — so a Moment isn't trapped behind one site's login.</p></div></div>
             <div class="feature"><span class="fi">5</span><div><h4>Yours to run</h4><p>Install it on your own server or hosting, own your community's data, and shape it with extensions — no platform can shut it down or change the rules on you.</p></div></div>
@@ -577,41 +571,31 @@
 <script>
     (function(){
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var body = document.getElementById('thread-body');
-        var typing = document.getElementById('typing');
-        var queue = [
-            {n:'Mara', i:'MV', c:'#2B4A9B', t:'now', m:'BC108s in the end. Warmer breakup than the 2N repros.'},
-            {n:'Elif', i:'EK', c:'#3D7C5F', t:'now', m:'Following this thread live from the workshop — demo clip when you have one?'},
-            {n:'Jonas', i:'JD', c:'#E8590C', t:'now', m:'Seconding the demo. Also: this is exactly why I missed forums.'},
-            {n:'Mara', i:'MV', c:'#2B4A9B', t:'now', m:'Uploading now. 12 seconds of glorious noise.'}
-        ];
-        var idx = 0, MAX_POSTS = 5;
+        if(reduced){ return; }
 
-        function addPost(p){
-            var el = document.createElement('div');
-            el.className = 'post incoming';
-            el.innerHTML = '<span class="avatar" style="background:'+p.c+'">'+p.i+'</span>'+
-                '<div><div class="meta"><b>'+p.n+'</b> · '+p.t+'</div><p>'+p.m+'</p></div>';
-            body.insertBefore(el, typing);
-            var posts = body.querySelectorAll('.post');
-            if(posts.length > MAX_POSTS){ posts[0].remove(); }
+        var reactionPill = document.getElementById('reaction-pill');
+        var replyPill = document.getElementById('reply-pill');
+        var reactionCount = document.getElementById('reaction-count');
+        var replyCount = document.getElementById('reply-count');
+        var queue = [reactionPill, replyPill, reactionPill, replyPill, reactionPill];
+        var counts = [reactionCount, replyCount, reactionCount, replyCount, reactionCount];
+        var idx = 0;
+
+        function bump(pill, count){
+            count.textContent = parseInt(count.textContent, 10) + 1;
+            pill.classList.remove('bump');
+            void pill.offsetWidth; // restart the CSS animation
+            pill.classList.add('bump');
         }
 
         function tick(){
             if(idx >= queue.length){ return; }
-            typing.hidden = false;
-            setTimeout(function(){
-                typing.hidden = true;
-                addPost(queue[idx++]);
-                setTimeout(tick, 3200 + Math.random()*1500);
-            }, 1400);
+            bump(queue[idx], counts[idx]);
+            idx++;
+            setTimeout(tick, 2600 + Math.random()*1800);
         }
 
-        if(reduced){
-            addPost(queue[0]); addPost(queue[1]);
-        } else {
-            setTimeout(tick, 2200);
-        }
+        setTimeout(tick, 2200);
     })();
 </script>
 </body>
