@@ -309,11 +309,11 @@
 }</pre>
             <p>No admin-facing disable toggle exists yet — this marker guarantees whatever eventually builds one must refuse for any <code>Extension</code> implementing it (a bundled tool a hosting provider requires stay on is the motivating case). <code>kopling/admin</code> implements it for exactly this reason. It only blocks disabling at runtime — removing the package from <code>composer.json</code> before install is unaffected.</p>
 
-            <h4 class="sub"><code>HasLoadOrder</code>: require a specific package before or after yours</h4>
-            <p>Core always loads first; every other extension otherwise loads alphabetically. Declare an explicit constraint when your extension needs a specific package loaded first — placing something into a Portal another extension registers, for instance:</p>
-            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\LoadOrder\HasLoadOrder;
+            <h4 class="sub"><code>LoadsAfter</code>/<code>LoadsBefore</code>: require a specific package before or after yours</h4>
+            <p>Core always loads first; every other extension otherwise loads alphabetically. Declare an explicit constraint when your extension needs a specific package loaded first — placing something into a Portal another extension registers, for instance. These are two separate single-method interfaces, not one — implement only the direction you actually need (usually just one) instead of declaring a no-op for the other:</p>
+            <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\LoadOrder\LoadsAfter;
 
-<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> HasLoadOrder
+<span class="kw">class</span> <span class="fn">Extension</span> <span class="kw">extends</span> AbstractExtension <span class="kw">implements</span> LoadsAfter
 {
     <span class="cm">// ...name(), description() as above</span>
 
@@ -322,17 +322,11 @@
     {
         <span class="kw">return</span> [<span class="st">'kopling/admin'</span>];
     }
-
-    <span class="cm">/** @return array&lt;string&gt; */</span>
-    <span class="kw">public function</span> <span class="fn">loadBefore</span>(): <span class="st">array</span>
-    {
-        <span class="kw">return</span> [];
-    }
 }</pre>
             <p>A package that isn't installed is silently ignored, never an error.</p>
 
             <h4 class="sub"><code>InfluencesLoadOrder</code>: require load order for anything implementing a contract you own</h4>
-            <p>Use this instead of <code>HasLoadOrder</code> when you own a contract and need every extension implementing it ordered relative to you, without knowing which packages will implement it:</p>
+            <p>Use this instead of <code>LoadsAfter</code>/<code>LoadsBefore</code> when you own a contract and need every extension implementing it ordered relative to you, without knowing which packages will implement it:</p>
             <pre class="code"><span class="kw">use</span> Kopling\Core\Extension\LoadOrder\Directive;
 <span class="kw">use</span> Kopling\Core\Extension\LoadOrder\InfluencesLoadOrder;
 
@@ -344,7 +338,7 @@
         <span class="kw">return</span> [YourContract::class =&gt; Directive::After];
     }
 }</pre>
-            <p>Matched via <code>instanceof</code> against every discovered extension. A matched extension's own explicit <code>HasLoadOrder</code> wins if the two disagree.</p>
+            <p>Matched via <code>instanceof</code> against every discovered extension. A matched extension's own explicit <code>LoadsAfter</code>/<code>LoadsBefore</code> wins if the two disagree.</p>
         </section>
         <hr class="divider">
 
@@ -514,7 +508,7 @@ Route::get(<span class="st">'/hello'</span>, <span class="kw">fn</span> () =&gt;
                     </tbody>
                 </table>
             </div>
-            <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that loads <em>before</em> yours (Core always loads first, everything else alphabetically by default) — never one that loads after, since it hasn't registered anything yet when yours runs. Use <code>HasLoadOrder</code>/<code>InfluencesLoadOrder</code> (Section 5) if you need a specific extension ordered relative to yours.</p>
+            <p class="dim">You can only <code>replace()</code>/<code>remove()</code> something registered by an extension that loads <em>before</em> yours (Core always loads first, everything else alphabetically by default) — never one that loads after, since it hasn't registered anything yet when yours runs. Use <code>LoadsAfter</code>/<code>LoadsBefore</code>/<code>InfluencesLoadOrder</code> (Section 5) if you need a specific extension ordered relative to yours.</p>
             <p class="dim">Slot names are entirely up to whichever Portal layout renders them (Section 7) — there's no fixed registry of slot names to pick from. <code>kopling-core::side-navigation</code> (Admin) exists today; Community defines its own separate set (<code>kopling-core::community.sidebar</code>, <code>.topbar</code>, <code>.rail</code>, <code>.content-top</code>, <code>.composer</code>) — some of those are still empty, nothing has registered into them yet. More slots on other Portals arrive the same way: a layout author decides a region is worth exposing and gives it a name.</p>
         </section>
         <hr class="divider">
@@ -622,7 +616,7 @@ Route::get(<span class="st">'/hello'</span>, <span class="kw">fn</span> () =&gt;
         <section id="reference">
             <span class="sec-num">Section 11</span>
             <h2>The reference implementation</h2>
-            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>ChangesUx</code>, <code>HasLoadOrder</code>, and <code>ExtendsPortals</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
+            <p><code>k-extensions/example</code> in the <code>kopling/development</code> monorepo is a dummy extension — not meant to do anything real — kept specifically so every convention on this page has a working, verified example behind it: every path, the <code>Extension</code> class, the <code>RequestsStorageDriver</code>, <code>HasPermissions</code>, <code>ChangesUx</code>, <code>LoadsAfter</code>, and <code>ExtendsPortals</code> contracts, and both icon sizes. Copy it as a starting point rather than assembling one from this page alone.</p>
             <p class="dim"><code>HasPortals</code> (Section 7) and <code>ChangesTheme</code> (Section 5) aren't demonstrated by <code>k-extensions/example</code> itself, but are real, working examples elsewhere in the monorepo: <code>kopling/admin</code> registers the Admin portal, <code>kopling/theme-delft</code> and <code>kopling/theme-midnight</code> each ship a full palette. <code>ListensToEvents</code> (Section 9) is demonstrated by <code>kopling/auth-email-password</code>, for both login and registration. <code>CannotBeDisabled</code> (Section 5) now has two implementors, Core and <code>kopling/admin</code> itself — see Section 5 for what that guarantees and what it doesn't. <code>Ux::replace()</code>/<code>remove()</code> and <code>InfluencesLoadOrder</code> (Section 5, 8) aren't demonstrated anywhere shipped yet — <code>kopling/admin</code> is the intended first <code>InfluencesLoadOrder</code> implementor, once it has a <code>HasSettings</code>-style contract worth requiring load order against. If this page and the monorepo ever disagree, the code is right and this page is stale — please tell us.</p>
         </section>
 
