@@ -91,7 +91,9 @@
         .reaction-pill,.reply-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.8rem;color:#5A6272;background:var(--porcelain);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
         .reaction-pill b,.reply-pill b{color:var(--ink);font-weight:700;display:inline-block}
         .reaction-pill.bump b,.reply-pill.bump b{animation:bump .5s ease}
+        .reaction-pill.bump,.reply-pill.bump{animation:pill-glow .8s ease}
         @keyframes bump{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
+        @keyframes pill-glow{0%{box-shadow:0 0 0 0 rgba(217,119,6,0);border-color:var(--line)}35%{box-shadow:0 0 16px 4px rgba(217,119,6,.55);border-color:rgba(217,119,6,.6)}100%{box-shadow:0 0 0 0 rgba(217,119,6,0);border-color:var(--line)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
         .meaning{background:var(--delft-night);color:var(--glaze);border-top:1px solid var(--line-light)}
@@ -226,7 +228,7 @@
         }
         @media (prefers-reduced-motion:reduce){
             html{scroll-behavior:auto}
-            .reaction-pill.bump b,.reply-pill.bump b,.live-pill .dot{animation:none}
+            .reaction-pill.bump b,.reply-pill.bump b,.reaction-pill.bump,.reply-pill.bump,.live-pill .dot{animation:none}
             *{transition:none !important}
         }
     </style>
@@ -272,11 +274,12 @@
                     <span class="live-pill"><span class="dot"></span>Live</span>
                 </div>
                 <div class="moment-body">
-                    <span class="tag-badge" style="background:#DB2777">Showcase</span>
-                    <h4 class="moment-title">First solder joints — the fuzz pedal that didn't hum</h4>
-                    <p class="moment-excerpt">Swapped the 2N repro transistors for BC108s tonight — warmer breakup, way less noise than the last build.</p>
+                    <span class="tag-badge" style="background:#D97706">Milestones</span>
+                    <h4 class="moment-title">She's here! 🎉 8lbs 2oz, and already got her dad wrapped around her finger</h4>
+                    <p class="moment-excerpt">36 hours of labor and worth every second — welcome to the world, little one. Mom and baby both doing great.</p>
                     <div class="moment-actions">
-                        <span class="reaction-pill" id="reaction-pill">🔥 <b id="reaction-count">3</b></span>
+                        <span class="reaction-pill" id="reaction-pill-baby">👶 <b id="reaction-count-baby">2</b></span>
+                        <span class="reaction-pill" id="reaction-pill-party">🥳 <b id="reaction-count-party">1</b></span>
                         <span class="reply-pill" id="reply-pill"><b id="reply-count">2</b> replies</span>
                     </div>
                 </div>
@@ -573,12 +576,14 @@
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if(reduced){ return; }
 
-        var reactionPill = document.getElementById('reaction-pill');
+        var reactionPillBaby = document.getElementById('reaction-pill-baby');
+        var reactionPillParty = document.getElementById('reaction-pill-party');
         var replyPill = document.getElementById('reply-pill');
-        var reactionCount = document.getElementById('reaction-count');
+        var reactionCountBaby = document.getElementById('reaction-count-baby');
+        var reactionCountParty = document.getElementById('reaction-count-party');
         var replyCount = document.getElementById('reply-count');
-        var queue = [reactionPill, replyPill, reactionPill, replyPill, reactionPill];
-        var counts = [reactionCount, replyCount, reactionCount, replyCount, reactionCount];
+        var queue = [reactionPillBaby, replyPill, reactionPillParty, replyPill, reactionPillBaby];
+        var counts = [reactionCountBaby, replyCount, reactionCountParty, replyCount, reactionCountBaby];
         var idx = 0;
 
         function bump(pill, count){
